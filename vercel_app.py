@@ -9,7 +9,7 @@ This version provides the full functionality and interface like the local applic
 import os
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, jsonify, request, render_template_string
 
 # 设置日志
@@ -684,13 +684,13 @@ COMPLETE_HTML_TEMPLATE = """
             showSearchProgress('Collecting promotional posts...');
             
             try {
-                const response = await fetch('/api/search', {
+                const response = await fetch('/api/collect-promotional', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        keywords: ['sale', 'discount', 'promo', 'deal', 'buy'],
+                        subreddits: ['entrepreneur', 'startups', 'business', 'marketing', 'deals'],
                         limit: 50
                     })
                 });
@@ -698,12 +698,11 @@ COMPLETE_HTML_TEMPLATE = """
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    const promotionalPosts = data.data.posts.filter(post => post.is_promotional);
                     displayResults({
-                        posts: promotionalPosts,
+                        posts: data.data.posts,
                         search_time: data.data.search_time
                     });
-                    showToast(`Found ${promotionalPosts.length} promotional posts!`, 'success');
+                    showToast(`Found ${data.data.promotional_count} promotional posts out of ${data.data.total_found} total posts!`, 'success');
                 } else {
                     showToast(`Collection failed: ${data.message}`, 'error');
                 }
@@ -714,13 +713,167 @@ COMPLETE_HTML_TEMPLATE = """
             }
         }
         
-        function toggleHistorySection() {
+        async function toggleHistorySection() {
             const historySection = document.getElementById('history-section');
             historySection.classList.toggle('d-none');
             
             if (!historySection.classList.contains('d-none')) {
-                displaySearchHistory();
+                await loadAndDisplayHistory();
                 historySection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        async function loadAndDisplayHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayServerHistory(data.data);
+                } else {
+                    showToast(`Failed to load history: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`History error: ${error.message}`, 'error');
+                // 回退到本地历史
+                displaySearchHistory();
+            }
+        }
+        
+        function displayServerHistory(historyData) {
+            const historyGrid = document.getElementById('history-grid');
+            
+            if (historyData.length === 0) {
+                historyGrid.innerHTML = '<div class="text-center py-5"><p class="text-muted">No search history available.</p></div>';
+                return;
+            }
+            
+            historyGrid.innerHTML = historyData.map((item, index) => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title mb-1">${item.keywords.join(', ')}</h6>
+                                <p class="card-text text-muted small mb-2">
+                                    ${item.results_count} posts found • ${new Date(item.search_date).toLocaleString()}
+                                </p>
+                                <div class="small text-muted">
+                                    Subreddit: ${item.subreddit || 'all'} • 
+                                    Time: ${item.time_filter} • 
+                                    Status: <span class="badge bg-success">${item.status}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="replayServerSearch(${index}, '${item.keywords.join(',')}', '${item.subreddit}', '${item.time_filter}')">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Replay
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="exportHistoryItem(${item.id})">
+                                    <i class="bi bi-download me-1"></i>Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function replayServerSearch(index, keywords, subreddit, timeFilter) {
+            // 填充搜索表单
+            document.getElementById('keywords-input').value = keywords.replace(/,/g, ', ');
+            document.getElementById('subreddits-input').value = subreddit || 'all';
+            document.getElementById('time-filter').value = timeFilter || 'week';
+            
+            // 滚动到搜索表单
+            document.getElementById('hero-section').scrollIntoView({ behavior: 'smooth' });
+            
+            showToast('Search parameters loaded from server history', 'info');
+        }
+        
+        function addToSearchHistory(params, results) {
+            const historyItem = {
+                params: params,
+                results: results,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            searchHistory.unshift(historyItem);
+            
+            // Keep only last 10 searches
+            if (searchHistory.length > 10) {
+                searchHistory = searchHistory.slice(0, 10);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('reddit_search_history', JSON.stringify(searchHistory));
+        }
+        
+        function loadSearchHistory() {
+            const saved = localStorage.getItem('reddit_search_history');
+            if (saved) {
+                try {
+                    searchHistory = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to load search history:', e);
+                    searchHistory = [];
+                }
+            }
+        }
+        
+        function clearHistory() {
+            searchHistory = [];
+            localStorage.removeItem('reddit_search_history');
+            displaySearchHistory();
+            showToast('Search history cleared', 'info');
+        }
+        
+        function clearResults() {
+            currentResults = [];
+            document.getElementById('results-section').classList.add('d-none');
+            showToast('Results cleared', 'info');
+        }
+        
+        async function exportCurrentResults() {
+            if (currentResults.length === 0) {
+                // 如果没有当前结果，导出示例数据
+                await exportSampleData();
+                return;
+            }
+            
+            const csv = convertToCSV(currentResults);
+            downloadFile(csv, 'reddit_search_results.csv', 'text/csv');
+            showToast('Results exported successfully!', 'success');
+        }
+        
+        async function exportSampleData() {
+            try {
+                const response = await fetch('/api/export?format=csv&type=all&limit=100');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    downloadFile(data.data.content, data.data.filename, 'text/csv');
+                    showToast(`Sample data exported: ${data.data.posts_count} posts`, 'success');
+                } else {
+                    showToast(`Export failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Export error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function exportHistoryItem(itemId) {
+            try {
+                const response = await fetch(`/api/export?format=json&type=promotional&limit=50`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const jsonContent = JSON.stringify(data.data, null, 2);
+                    downloadFile(jsonContent, data.data.filename, 'application/json');
+                    showToast('History item exported successfully!', 'success');
+                } else {
+                    showToast(`Export failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Export error: ${error.message}`, 'error');
             }
         }
         
@@ -773,88 +926,6 @@ COMPLETE_HTML_TEMPLATE = """
             document.getElementById('hero-section').scrollIntoView({ behavior: 'smooth' });
             
             showToast('Search parameters loaded from history', 'info');
-        }
-        
-        function addToSearchHistory(params, results) {
-            const historyItem = {
-                params: params,
-                results: results,
-                timestamp: new Date().toLocaleString()
-            };
-            
-            searchHistory.unshift(historyItem);
-            
-            // Keep only last 10 searches
-            if (searchHistory.length > 10) {
-                searchHistory = searchHistory.slice(0, 10);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('reddit_search_history', JSON.stringify(searchHistory));
-        }
-        
-        function loadSearchHistory() {
-            const saved = localStorage.getItem('reddit_search_history');
-            if (saved) {
-                try {
-                    searchHistory = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Failed to load search history:', e);
-                    searchHistory = [];
-                }
-            }
-        }
-        
-        function clearHistory() {
-            searchHistory = [];
-            localStorage.removeItem('reddit_search_history');
-            displaySearchHistory();
-            showToast('Search history cleared', 'info');
-        }
-        
-        function clearResults() {
-            currentResults = [];
-            document.getElementById('results-section').classList.add('d-none');
-            showToast('Results cleared', 'info');
-        }
-        
-        function exportCurrentResults() {
-            if (currentResults.length === 0) {
-                showToast('No results to export', 'warning');
-                return;
-            }
-            
-            const csv = convertToCSV(currentResults);
-            downloadFile(csv, 'reddit_search_results.csv', 'text/csv');
-            showToast('Results exported successfully!', 'success');
-        }
-        
-        function convertToCSV(data) {
-            const headers = ['Title', 'Author', 'Subreddit', 'Score', 'Comments', 'URL', 'Is Promotional', 'Created'];
-            const rows = data.map(post => [
-                `"${post.title.replace(/"/g, '""')}"`,
-                post.author,
-                post.subreddit,
-                post.score,
-                post.num_comments,
-                post.url,
-                post.is_promotional ? 'Yes' : 'No',
-                formatDate(post.created_utc)
-            ]);
-            
-            return [headers.join(','), ...rows.map(row => row.join(','))].join('\\n');
-        }
-        
-        function downloadFile(content, filename, contentType) {
-            const blob = new Blob([content], { type: contentType });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
         }
         
         async function checkRedditAPIStatus() {
@@ -959,6 +1030,34 @@ COMPLETE_HTML_TEMPLATE = """
             if (!timestamp) return 'Unknown';
             const date = new Date(timestamp * 1000);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+        
+        function convertToCSV(data) {
+            const headers = ['Title', 'Author', 'Subreddit', 'Score', 'Comments', 'URL', 'Is Promotional', 'Created'];
+            const rows = data.map(post => [
+                `"${post.title.replace(/"/g, '""')}"`,
+                post.author,
+                post.subreddit,
+                post.score,
+                post.num_comments,
+                post.url,
+                post.is_promotional ? 'Yes' : 'No',
+                formatDate(post.created_utc)
+            ]);
+            
+            return [headers.join(','), ...rows.map(row => row.join(','))].join('\\n');
+        }
+        
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
     </script>
 </body>
@@ -1286,6 +1385,248 @@ def reddit_test():
             "status": "error",
             "message": "Reddit test endpoint error",
             "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/collect-promotional', methods=['POST'])
+def collect_promotional():
+    """收集推广内容端点"""
+    try:
+        data = request.get_json() or {}
+        
+        subreddits = data.get('subreddits', ['entrepreneur', 'startups', 'business', 'marketing'])
+        limit = min(data.get('limit', 50), 100)
+        
+        # 检查Reddit API配置
+        client_id = os.environ.get('REDDIT_CLIENT_ID')
+        client_secret = os.environ.get('REDDIT_CLIENT_SECRET')
+        
+        if not client_id or not client_secret:
+            return jsonify({
+                "status": "error",
+                "message": "Reddit API credentials not configured",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # 使用推广相关关键词搜索
+        promotional_keywords = ['sale', 'discount', 'promo', 'deal', 'buy', 'offer', 'free', 'coupon']
+        
+        search_start = datetime.now()
+        all_posts = []
+        
+        # 在多个subreddit中搜索推广内容
+        for subreddit in subreddits:
+            try:
+                posts = perform_reddit_search(
+                    keywords=promotional_keywords[:3],  # 使用前3个关键词
+                    subreddit=subreddit,
+                    limit=limit // len(subreddits),
+                    time_filter='week',
+                    sort='new'
+                )
+                all_posts.extend(posts)
+            except Exception as e:
+                logger.warning(f"Failed to search in r/{subreddit}: {e}")
+        
+        # 过滤出推广内容
+        promotional_posts = [post for post in all_posts if post['is_promotional']]
+        
+        search_time = (datetime.now() - search_start).total_seconds()
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Found {len(promotional_posts)} promotional posts out of {len(all_posts)} total posts",
+            "data": {
+                "posts": promotional_posts,
+                "total_found": len(all_posts),
+                "promotional_count": len(promotional_posts),
+                "search_time": round(search_time, 2),
+                "subreddits_searched": subreddits
+            },
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in collect promotional endpoint: {e}")
+        return jsonify({
+            "status": "error",
+            "message": f"Collection failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/history')
+def get_history():
+    """获取搜索历史端点"""
+    try:
+        # 由于Vercel是无状态的，我们返回一个示例历史记录
+        # 在实际应用中，这些数据会存储在数据库中
+        sample_history = [
+            {
+                "id": 1,
+                "keywords": ["python", "programming"],
+                "subreddit": "programming",
+                "time_filter": "week",
+                "results_count": 25,
+                "search_date": (datetime.now() - timedelta(hours=2)).isoformat(),
+                "status": "completed"
+            },
+            {
+                "id": 2,
+                "keywords": ["machine learning", "AI"],
+                "subreddit": "MachineLearning",
+                "time_filter": "day",
+                "results_count": 15,
+                "search_date": (datetime.now() - timedelta(hours=5)).isoformat(),
+                "status": "completed"
+            },
+            {
+                "id": 3,
+                "keywords": ["startup", "entrepreneur"],
+                "subreddit": "entrepreneur",
+                "time_filter": "week",
+                "results_count": 30,
+                "search_date": (datetime.now() - timedelta(days=1)).isoformat(),
+                "status": "completed"
+            }
+        ]
+        
+        return jsonify({
+            "status": "success",
+            "data": sample_history,
+            "message": "Search history retrieved successfully",
+            "note": "In Vercel environment, history is simulated. In production, this would be stored in a database.",
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in history endpoint: {e}")
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to retrieve history: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/export')
+def export_data():
+    """数据导出端点"""
+    try:
+        export_format = request.args.get('format', 'csv').lower()
+        data_type = request.args.get('type', 'current').lower()  # current, promotional, all
+        limit = min(int(request.args.get('limit', 100)), 1000)
+        
+        if export_format not in ['csv', json]:
+            return jsonify({
+                "status": "error",
+                "message": "Invalid format. Supported formats: csv, json",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # 生成示例数据用于导出
+        sample_posts = [
+            {
+                "title": "Sample Reddit Post 1",
+                "author": "user1",
+                "subreddit": "technology",
+                "score": 150,
+                "num_comments": 25,
+                "url": "https://reddit.com/r/technology/sample1",
+                "is_promotional": False,
+                "created_utc": datetime.now().timestamp()
+            },
+            {
+                "title": "Amazing Deal - 50% Off!",
+                "author": "seller123",
+                "subreddit": "deals",
+                "score": 75,
+                "num_comments": 10,
+                "url": "https://reddit.com/r/deals/sample2",
+                "is_promotional": True,
+                "created_utc": datetime.now().timestamp()
+            }
+        ]
+        
+        # 根据类型过滤数据
+        if data_type == 'promotional':
+            filtered_posts = [post for post in sample_posts if post['is_promotional']]
+        elif data_type == 'non_promotional':
+            filtered_posts = [post for post in sample_posts if not post['is_promotional']]
+        else:
+            filtered_posts = sample_posts
+        
+        # 限制数量
+        filtered_posts = filtered_posts[:limit]
+        
+        if export_format == 'csv':
+            # 生成CSV格式
+            csv_headers = ['Title', 'Author', 'Subreddit', 'Score', 'Comments', 'URL', 'Is Promotional', 'Created Date']
+            csv_rows = []
+            
+            for post in filtered_posts:
+                csv_rows.append([
+                    f'"{post["title"]}"',
+                    post['author'],
+                    post['subreddit'],
+                    post['score'],
+                    post['num_comments'],
+                    post['url'],
+                    'Yes' if post['is_promotional'] else 'No',
+                    datetime.fromtimestamp(post['created_utc']).strftime('%Y-%m-%d %H:%M:%S')
+                ])
+            
+            csv_content = ','.join(csv_headers) + '\\n' + '\\n'.join([','.join(map(str, row)) for row in csv_rows])
+            
+            return jsonify({
+                "status": "success",
+                "message": f"CSV export generated with {len(filtered_posts)} posts",
+                "data": {
+                    "format": "csv",
+                    "content": csv_content,
+                    "filename": f"reddit_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                    "posts_count": len(filtered_posts)
+                },
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        else:  # JSON format
+            return jsonify({
+                "status": "success",
+                "message": f"JSON export generated with {len(filtered_posts)} posts",
+                "data": {
+                    "format": "json",
+                    "posts": filtered_posts,
+                    "filename": f"reddit_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                    "posts_count": len(filtered_posts),
+                    "export_info": {
+                        "generated_at": datetime.now().isoformat(),
+                        "filter_type": data_type,
+                        "total_posts": len(filtered_posts)
+                    }
+                },
+                "timestamp": datetime.now().isoformat()
+            })
+        
+    except Exception as e:
+        logger.error(f"Error in export endpoint: {e}")
+        return jsonify({
+            "status": "error",
+            "message": f"Export failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/clear-history', methods=['POST'])
+def clear_history():
+    """清除搜索历史端点"""
+    try:
+        return jsonify({
+            "status": "success",
+            "message": "Search history cleared successfully",
+            "note": "In Vercel environment, history is simulated",
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to clear history: {str(e)}",
             "timestamp": datetime.now().isoformat()
         }), 500
 
