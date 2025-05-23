@@ -21,6 +21,5 @@
     "FLASK_ENV": "production",
     "PYTHONPATH": ".",
     "VERCEL": "1"
-  },
-  "regions": ["hkg1", "sin1", "sfo1"]
+  }
 } 
