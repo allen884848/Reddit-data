@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按钮测试页面</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #ff4500, #ff6b35);
+            color: white;
+            padding: 4rem 0;
+        }
+        
+        .quick-actions {
+            padding: 2rem 0;
+        }
+
+        .quick-actions .btn {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #ff4500;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-actions .btn:hover {
+            background-color: white;
+            border-color: white;
+            color: #ff4500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-actions .btn i {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h1 class="display-4 fw-light mb-3">按钮测试页面</h1>
+                        <p class="lead">测试三个快速操作按钮是否正确显示</p>
+                    </div>
+                    
+                    <!-- Quick Action Buttons -->
+                    <div class="quick-actions mt-4">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light btn-lg" onclick="testButton1()">
+                                    <i class="bi bi-bullseye me-2"></i>
+                                    Collect Promotional Posts
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light btn-lg" onclick="testButton2()">
+                                    <i class="bi bi-clock-history me-2"></i>
+                                    View History
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-light btn-lg" onclick="testButton3()">
+                                    <i class="bi bi-download me-2"></i>
+                                    Export Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h3>测试结果：</h3>
+                <div id="test-results" class="alert alert-info">
+                    点击上面的按钮来测试功能...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function testButton1() {
+            document.getElementById('test-results').innerHTML = 
+                '<strong>✅ 按钮1 (Collect Promotional Posts) 工作正常！</strong><br>' +
+                '这个按钮会调用 /api/collect-promotional 端点来收集推广内容。';
+        }
+        
+        function testButton2() {
+            document.getElementById('test-results').innerHTML = 
+                '<strong>✅ 按钮2 (View History) 工作正常！</strong><br>' +
+                '这个按钮会调用 /api/history 端点来显示搜索历史。';
+        }
+        
+        function testButton3() {
+            document.getElementById('test-results').innerHTML = 
+                '<strong>✅ 按钮3 (Export Data) 工作正常！</strong><br>' +
+                '这个按钮会调用 /api/export 端点来导出数据。';
+        }
+    </script>
+</body>
+</html> 
