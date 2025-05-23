@@ -1,0 +1,24 @@
+# Vercel Deployment Requirements
+# ==============================
+# Minimal dependencies for Vercel serverless deployment
+
+# Core Flask Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Reddit API Integration
+praw==7.8.1
+prawcore==2.4.0
+
+# Data Processing (Essential only)
+pandas==2.1.4
+requests==2.31.0
+
+# Environment Configuration
+python-dotenv==1.0.0
+
+# Date/Time Processing
+python-dateutil==2.8.2
+
+# Basic Security
+bleach==6.1.0 

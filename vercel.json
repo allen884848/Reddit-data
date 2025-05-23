@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "reddit-data-collector",
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "PYTHONPATH": "."
+  },
+  "functions": {
+    "app.py": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["hkg1", "sin1", "sfo1"]
+} 

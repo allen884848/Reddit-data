@@ -1,0 +1,148 @@
+# Reddit Data Collection Website - Python Dependencies
+# =====================================================
+# 
+# This file contains all the Python packages required for the Reddit data collection application.
+# Install all dependencies using: pip install -r requirements.txt
+#
+# Core Framework and Web Development
+# ----------------------------------
+Flask==3.0.0
+Werkzeug==3.0.1
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+
+# Reddit API Integration
+# ----------------------
+praw==7.8.1
+prawcore==2.4.0
+requests==2.31.0
+urllib3==2.1.0
+certifi==2023.11.17
+charset-normalizer==3.3.2
+idna==3.6
+
+# Database and Data Processing
+# ----------------------------
+# SQLite is included with Python, no additional package needed
+pandas==2.1.4
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+
+# Web Scraping and Content Analysis (Optional)
+# --------------------------------------------
+beautifulsoup4==4.12.2
+lxml==4.9.3
+nltk==3.8.1
+
+# Date and Time Handling
+# ----------------------
+python-dateutil==2.8.2
+pytz==2023.3.post1
+
+# Configuration and Environment
+# -----------------------------
+python-dotenv==1.0.0
+configparser==6.0.0
+
+# Logging and Monitoring
+# ----------------------
+colorlog==6.7.0
+
+# Security and Validation
+# -----------------------
+validators==0.22.0
+bleach==6.1.0
+
+# Rate Limiting and Caching
+# -------------------------
+Flask-Limiter==3.5.0
+Flask-Caching==2.1.0
+
+# Background Tasks (Optional)
+# ---------------------------
+celery==5.3.4
+redis==5.0.1
+
+# Testing and Development
+# -----------------------
+pytest==7.4.3
+pytest-flask==1.3.0
+pytest-cov==4.1.0
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+
+# API Documentation (Optional)
+# ----------------------------
+flask-restx==1.3.0
+marshmallow==3.20.1
+
+# Performance and Optimization
+# ----------------------------
+gunicorn==21.2.0
+gevent==23.9.1
+
+# Data Visualization (Optional)
+# -----------------------------
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+
+# Additional Utilities
+# --------------------
+tqdm==4.66.1
+schedule==1.2.0
+psutil==5.9.6
+
+# Text Processing and Analysis
+# ---------------------------
+textblob==0.17.1
+wordcloud==1.9.2
+regex==2023.10.3
+
+# File Handling
+# -------------
+pathlib2==2.3.7
+chardet==5.2.0
+
+# Network and HTTP
+# ----------------
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Development Tools
+# -----------------
+ipython==8.17.2
+jupyter==1.0.0
+notebook==7.0.6
+
+# Version Information
+# -------------------
+# Python Version: 3.7+
+# Last Updated: 2024
+# 
+# Installation Notes:
+# - Some packages may have different version requirements based on your Python version
+# - For production deployment, consider pinning to specific versions
+# - Optional packages can be removed if not needed for your use case
+# 
+# Quick Installation Commands:
+# ---------------------------
+# Basic installation:
+#   pip install -r requirements.txt
+# 
+# Development installation (includes testing tools):
+#   pip install -r requirements.txt
+# 
+# Production installation (minimal dependencies):
+#   pip install Flask praw pandas requests python-dotenv
+# 
+# Virtual Environment Setup:
+#   python -m venv venv
+#   source venv/bin/activate  # On Windows: venv\Scripts\activate
+#   pip install -r requirements.txt
+
+# Vercel-specific dependencies
+# Note: Vercel automatically handles most Python dependencies 

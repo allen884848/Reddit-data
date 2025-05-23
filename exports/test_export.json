@@ -1,0 +1,51 @@
+{
+  "export_info": {
+    "filters_applied": {},
+    "timestamp": "2025-05-23T11:40:22.203832",
+    "total_posts": 3
+  },
+  "posts": [
+    {
+      "author": "user_2",
+      "collected_at": "2025-05-23T03:36:55",
+      "content": "This is sample content for post 2",
+      "created_utc": "2025-05-21T11:36:55.377061",
+      "id": 3,
+      "is_promotional": false,
+      "num_comments": 4,
+      "reddit_id": "sample_2",
+      "score": 20,
+      "subreddit": "test",
+      "title": "Sample Post 2",
+      "url": "https://reddit.com/r/test/comments/sample_2"
+    },
+    {
+      "author": "user_1",
+      "collected_at": "2025-05-23T03:36:55",
+      "content": "This is sample content for post 1",
+      "created_utc": "2025-05-22T11:36:55.377055",
+      "id": 2,
+      "is_promotional": false,
+      "num_comments": 2,
+      "reddit_id": "sample_1",
+      "score": 10,
+      "subreddit": "test",
+      "title": "Sample Post 1",
+      "url": "https://reddit.com/r/test/comments/sample_1"
+    },
+    {
+      "author": "user_0",
+      "collected_at": "2025-05-23T03:36:55",
+      "content": "This is sample content for post 0",
+      "created_utc": "2025-05-23T11:36:55.377037",
+      "id": 1,
+      "is_promotional": true,
+      "num_comments": 0,
+      "reddit_id": "sample_0",
+      "score": 0,
+      "subreddit": "test",
+      "title": "Sample Post 0",
+      "url": "https://reddit.com/r/test/comments/sample_0"
+    }
+  ]
+}
