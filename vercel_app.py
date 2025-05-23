@@ -160,30 +160,31 @@ COMPLETE_HTML_TEMPLATE = """
         }
 
         .quick-actions {
-            padding: 2rem 0;
+            padding: 1.5rem 0;
         }
 
         .quick-actions .btn {
             background-color: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             color: var(--primary-color);
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 0.875rem;
         }
 
         .quick-actions .btn:hover {
             background-color: white;
             border-color: white;
             color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
         }
 
         .quick-actions .btn i {
-            font-size: 1.1em;
+            font-size: 1em;
         }
     </style>
     
@@ -339,22 +340,22 @@ COMPLETE_HTML_TEMPLATE = """
                             
                             <!-- Quick Action Buttons -->
                             <div class="quick-actions mt-4">
-                                <div class="row g-3 justify-content-center">
+                                <div class="row g-2 justify-content-center">
                                     <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-lg" id="collect-promotional-btn">
-                                            <i class="bi bi-bullseye me-2"></i>
+                                        <button type="button" class="btn btn-light btn-sm" id="collect-promotional-btn">
+                                            <i class="bi bi-bullseye me-1"></i>
                                             Collect Promotional Posts
                                         </button>
                                     </div>
                                     <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-lg" id="view-history-btn">
-                                            <i class="bi bi-clock-history me-2"></i>
+                                        <button type="button" class="btn btn-light btn-sm" id="view-history-btn">
+                                            <i class="bi bi-clock-history me-1"></i>
                                             View History
                                         </button>
                                     </div>
                                     <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-lg" id="export-data-btn">
-                                            <i class="bi bi-download me-2"></i>
+                                        <button type="button" class="btn btn-light btn-sm" id="export-data-btn">
+                                            <i class="bi bi-download me-1"></i>
                                             Export Data
                                         </button>
                                     </div>
