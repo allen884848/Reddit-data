@@ -1,9 +1,9 @@
 """
-Vercel Enhanced Flask Application
+Vercel Complete Flask Application
 ===============================
 
-Enhanced version of the Reddit Data Collector for Vercel deployment.
-This version includes Reddit search functionality and a complete web interface.
+Complete version of the Reddit Data Collector for Vercel deployment.
+This version provides the full functionality and interface like the local application.
 """
 
 import os
@@ -20,216 +20,668 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'vercel-reddit-collector-key-2025')
 
-# 增强的HTML模板
-HTML_TEMPLATE = """
+# 完整的HTML模板 - 与本地应用相同的界面
+COMPLETE_HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reddit Data Collector - Vercel Enhanced</title>
+    <title>Reddit Data Collector</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background: #f5f5f5;
+        :root {
+            --primary-color: #ff4500;
+            --secondary-color: #0079d3;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
         }
-        .header { 
-            background: linear-gradient(135deg, #ff4500, #ff6b35); 
-            color: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            text-align: center;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #ff4500, #ff6b35);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+
+        .search-input-group .form-control {
+            border: 2px solid #e9ecef;
+            font-size: 1.1rem;
+            padding: 0.75rem 1rem;
         }
-        .card { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .search-input-group .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(255, 69, 0, 0.25);
         }
-        .search-section {
-            grid-column: 1 / -1;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
         }
-        .api-endpoint { 
-            margin: 10px 0; 
-            padding: 12px; 
-            background: #f8f9fa; 
-            border-radius: 6px; 
-            border-left: 4px solid #ff4500;
+
+        .btn-primary:hover {
+            background-color: #e03d00;
+            border-color: #e03d00;
         }
-        .success { color: #28a745; font-weight: bold; }
-        .error { color: #dc3545; font-weight: bold; }
-        .warning { color: #ffc107; font-weight: bold; }
-        .search-form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .search-input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .search-button {
-            padding: 12px 24px;
-            background: #ff4500;
-            color: white;
+
+        .card {
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease-in-out;
         }
-        .search-button:hover {
-            background: #e03d00;
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        .results {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            display: none;
+
+        .post-card {
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
         }
-        .post-item {
-            background: white;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #ff4500;
+
+        .post-card.promotional {
+            border-left-color: var(--warning-color);
+            background-color: #fff8e1;
         }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
+
+        .status-section {
+            padding: 2rem 0;
         }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: rgba(255, 69, 0, 0.1);
+        }
+
+        .results-section {
+            padding: 2rem 0;
+        }
+
+        .history-section {
+            padding: 2rem 0;
+        }
+
+        .footer {
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .toast {
+            min-width: 300px;
+        }
+
         @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
+            .hero-section {
+                padding: 2rem 0;
             }
-            .search-form {
-                flex-direction: column;
+            
+            .search-container {
+                padding: 1.5rem;
             }
         }
     </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
 </head>
 <body>
-    <div class="header">
-        <h1>🚀 Reddit Data Collector</h1>
-        <p>Vercel增强版 - 完整功能</p>
-        <p>实时Reddit数据采集与分析平台</p>
-    </div>
-    
-    <div class="container">
-        <div class="card">
-            <h2>📊 系统状态</h2>
-            <p><strong>部署环境:</strong> Vercel Serverless</p>
-            <p><strong>状态:</strong> <span class="success">✅ 运行正常</span></p>
-            <p><strong>时间:</strong> {{ timestamp }}</p>
-            <p><strong>版本:</strong> Enhanced v2.0</p>
-            <p><strong>Reddit API:</strong> <span id="reddit-status" class="warning">检测中...</span></p>
-        </div>
-        
-        <div class="card">
-            <h2>🔗 API端点</h2>
-            <div class="api-endpoint">
-                <strong>GET /api/health</strong> - 健康检查
-            </div>
-            <div class="api-endpoint">
-                <strong>GET /api/status</strong> - 系统状态
-            </div>
-            <div class="api-endpoint">
-                <strong>POST /api/search</strong> - Reddit搜索
-            </div>
-            <div class="api-endpoint">
-                <strong>GET /api/reddit/test</strong> - Reddit连接测试
-            </div>
-        </div>
-    </div>
-    
-    <div class="search-section">
-        <h2>🔍 Reddit数据搜索</h2>
-        <p>输入关键词搜索Reddit帖子，支持多个关键词（用逗号分隔）</p>
-        
-        <div class="search-form">
-            <input type="text" id="keywords" class="search-input" placeholder="输入搜索关键词，例如：python, programming, AI" value="python">
-            <input type="text" id="subreddit" class="search-input" placeholder="指定subreddit（可选）" value="">
-            <input type="number" id="limit" class="search-input" placeholder="结果数量" value="10" min="1" max="100" style="flex: 0 0 120px;">
-            <button onclick="searchReddit()" class="search-button">🔍 搜索</button>
-        </div>
-        
-        <div id="results" class="results">
-            <div id="loading" class="loading" style="display: none;">
-                <p>🔄 正在搜索Reddit数据...</p>
-            </div>
-            <div id="search-results"></div>
-        </div>
-    </div>
-    
-    <div class="card">
-        <h2>⚠️ 功能说明</h2>
-        <p>这是Vercel环境的增强版本，包含以下功能：</p>
-        <ul>
-            <li>✅ 实时Reddit数据搜索</li>
-            <li>✅ 多关键词搜索支持</li>
-            <li>✅ 推广内容检测</li>
-            <li>✅ RESTful API接口</li>
-            <li>⚠️ 数据不持久化（无服务器限制）</li>
-            <li>⚠️ 搜索结果有数量限制</li>
-        </ul>
-    </div>
-
-    <script>
-        // 检查Reddit API状态
-        fetch('/api/reddit/test')
-            .then(response => response.json())
-            .then(data => {
-                const statusElement = document.getElementById('reddit-status');
-                if (data.status === 'success') {
-                    statusElement.innerHTML = '<span class="success">✅ 已连接</span>';
-                } else {
-                    statusElement.innerHTML = '<span class="error">❌ 未配置</span>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('reddit-status').innerHTML = '<span class="error">❌ 连接失败</span>';
-            });
-
-        // Reddit搜索功能
-        async function searchReddit() {
-            const keywords = document.getElementById('keywords').value.trim();
-            const subreddit = document.getElementById('subreddit').value.trim();
-            const limit = parseInt(document.getElementById('limit').value) || 10;
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-reddit text-danger me-2 fs-4"></i>
+                <span class="fw-bold">Reddit Data Collector</span>
+            </a>
             
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#search-section">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#results-section">Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#history-section">History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#status-section">Status</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid">
+        <!-- Hero Section -->
+        <section id="hero-section" class="hero-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-xl-6">
+                        <div class="text-center mb-5">
+                            <h1 class="display-4 fw-light mb-3">Reddit Data Collector</h1>
+                            <p class="lead text-white-50">Discover and analyze Reddit content with advanced search and promotional detection</p>
+                        </div>
+                        
+                        <!-- Search Form -->
+                        <div class="search-container">
+                            <form id="search-form" class="search-form">
+                                <div class="search-input-group">
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="bi bi-search text-muted"></i>
+                                        </span>
+                                        <input type="text" 
+                                               id="keywords-input" 
+                                               class="form-control border-start-0 ps-0" 
+                                               placeholder="Enter keywords to search Reddit..."
+                                               autocomplete="off">
+                                        <button type="submit" class="btn btn-primary px-4">
+                                            <span class="search-btn-text">Search</span>
+                                            <span class="search-btn-spinner d-none">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                Searching...
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Advanced Options Toggle -->
+                                <div class="text-center mt-3">
+                                    <button type="button" 
+                                            class="btn btn-link btn-sm text-decoration-none" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#advanced-options">
+                                        <i class="bi bi-gear me-1"></i>
+                                        Advanced Options
+                                        <i class="bi bi-chevron-down ms-1"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Advanced Options Panel -->
+                                <div class="collapse mt-3" id="advanced-options">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label for="subreddits-input" class="form-label">Subreddits</label>
+                                                    <input type="text" 
+                                                           id="subreddits-input" 
+                                                           class="form-control" 
+                                                           placeholder="e.g., technology, programming"
+                                                           value="all">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="time-filter" class="form-label">Time Range</label>
+                                                    <select id="time-filter" class="form-select">
+                                                        <option value="hour">Past Hour</option>
+                                                        <option value="day">Past Day</option>
+                                                        <option value="week" selected>Past Week</option>
+                                                        <option value="month">Past Month</option>
+                                                        <option value="year">Past Year</option>
+                                                        <option value="all">All Time</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="sort-by" class="form-label">Sort By</label>
+                                                    <select id="sort-by" class="form-select">
+                                                        <option value="relevance" selected>Relevance</option>
+                                                        <option value="hot">Hot</option>
+                                                        <option value="new">New</option>
+                                                        <option value="top">Top</option>
+                                                        <option value="comments">Comments</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="limit-input" class="form-label">Post Limit</label>
+                                                    <select id="limit-input" class="form-select">
+                                                        <option value="25">25 posts</option>
+                                                        <option value="50">50 posts</option>
+                                                        <option value="100" selected>100 posts</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-4">
+                                                            <label for="min-score" class="form-label">Min Score</label>
+                                                            <input type="number" id="min-score" class="form-control" value="0" min="0">
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label for="min-comments" class="form-label">Min Comments</label>
+                                                            <input type="number" id="min-comments" class="form-control" value="0" min="0">
+                                                        </div>
+                                                        <div class="col-md-4 d-flex align-items-end">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="include-nsfw">
+                                                                <label class="form-check-label" for="include-nsfw">
+                                                                    Include NSFW
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <!-- Quick Action Buttons -->
+                            <div class="quick-actions mt-4">
+                                <div class="row g-2 justify-content-center">
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-outline-light btn-sm" id="collect-promotional-btn">
+                                            <i class="bi bi-bullseye me-1"></i>
+                                            Collect Promotional Posts
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-outline-light btn-sm" id="view-history-btn">
+                                            <i class="bi bi-clock-history me-1"></i>
+                                            View History
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-outline-light btn-sm" id="export-data-btn">
+                                            <i class="bi bi-download me-1"></i>
+                                            Export Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <section id="status-bar" class="status-bar d-none">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-info d-flex align-items-center mb-0" role="alert">
+                            <div class="spinner-border spinner-border-sm me-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong id="status-title">Searching Reddit...</strong>
+                                <div id="status-message" class="small">Please wait while we collect data from Reddit</div>
+                            </div>
+                            <button type="button" class="btn-close" id="status-close"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section d-none">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Results Header -->
+                        <div class="results-header d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h2 class="h4 mb-1">Search Results</h2>
+                                <p class="text-muted mb-0" id="results-summary">Found 0 posts</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-download me-1"></i>
+                                        Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" data-format="csv">
+                                            <i class="bi bi-filetype-csv me-2"></i>CSV Format
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" data-format="json">
+                                            <i class="bi bi-filetype-json me-2"></i>JSON Format
+                                        </a></li>
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="clear-results-btn">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Grid -->
+                        <div id="results-grid" class="results-grid">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history-section" class="history-section d-none">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 mb-0">Search History</h2>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="clear-history-btn">
+                                <i class="bi bi-trash me-1"></i>
+                                Clear History
+                            </button>
+                        </div>
+                        
+                        <div id="history-grid" class="history-grid">
+                            <!-- History will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Status Section -->
+        <section id="status-section" class="status-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="h4 mb-4">System Status</h2>
+                        
+                        <div class="row g-4">
+                            <!-- System Health -->
+                            <div class="col-lg-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="status-icon me-3">
+                                                <i class="bi bi-heart-pulse text-success fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-1">System Health</h5>
+                                                <p class="card-text text-muted small mb-0">Overall system status</p>
+                                            </div>
+                                        </div>
+                                        <div id="system-health" class="status-content">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Status:</span>
+                                                <span class="badge bg-success">{{ system_status }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <span>Environment:</span>
+                                                <span class="fw-bold">Vercel</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Reddit API -->
+                            <div class="col-lg-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="status-icon me-3">
+                                                <i class="bi bi-reddit text-danger fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-1">Reddit API</h5>
+                                                <p class="card-text text-muted small mb-0">API connection status</p>
+                                            </div>
+                                        </div>
+                                        <div id="reddit-api-status" class="status-content">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Status:</span>
+                                                <span class="badge bg-{{ reddit_status_color }}">{{ reddit_status }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <span>Mode:</span>
+                                                <span class="fw-bold">{{ reddit_mode }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Application Info -->
+                            <div class="col-lg-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="status-icon me-3">
+                                                <i class="bi bi-info-circle text-info fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-1">Application</h5>
+                                                <p class="card-text text-muted small mb-0">Version and info</p>
+                                            </div>
+                                        </div>
+                                        <div id="app-info" class="status-content">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Version:</span>
+                                                <span class="fw-bold">v2.0</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <span>Updated:</span>
+                                                <span class="fw-bold">{{ timestamp }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4 bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">
+                        <i class="bi bi-reddit text-danger me-1"></i>
+                        Reddit Data Collector v2.0 - Vercel Edition
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-muted">
+                        Built with Flask, Bootstrap & ❤️
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <!-- Toasts will be added here dynamically -->
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Application state
+        let searchHistory = [];
+        let currentResults = [];
+        
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadSearchHistory();
+            checkRedditAPIStatus();
+        });
+        
+        function initializeApp() {
+            // Bind event listeners
+            document.getElementById('search-form').addEventListener('submit', handleSearch);
+            document.getElementById('collect-promotional-btn').addEventListener('click', collectPromotionalPosts);
+            document.getElementById('view-history-btn').addEventListener('click', toggleHistorySection);
+            document.getElementById('export-data-btn').addEventListener('click', exportCurrentResults);
+            document.getElementById('clear-results-btn').addEventListener('click', clearResults);
+            document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+            document.getElementById('status-close').addEventListener('click', hideStatusBar);
+            
+            // Enable enter key search
+            document.getElementById('keywords-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearch(e);
+                }
+            });
+            
+            showToast('Application initialized successfully!', 'success');
+        }
+        
+        async function handleSearch(e) {
+            e.preventDefault();
+            
+            const keywords = document.getElementById('keywords-input').value.trim();
             if (!keywords) {
-                alert('请输入搜索关键词');
+                showToast('Please enter search keywords', 'warning');
                 return;
             }
             
-            const resultsDiv = document.getElementById('results');
-            const loadingDiv = document.getElementById('loading');
-            const searchResults = document.getElementById('search-results');
+            const searchParams = {
+                keywords: keywords.split(',').map(k => k.trim()),
+                subreddit: document.getElementById('subreddits-input').value.trim() || null,
+                time_filter: document.getElementById('time-filter').value,
+                sort: document.getElementById('sort-by').value,
+                limit: parseInt(document.getElementById('limit-input').value),
+                min_score: parseInt(document.getElementById('min-score').value) || 0,
+                min_comments: parseInt(document.getElementById('min-comments').value) || 0,
+                include_nsfw: document.getElementById('include-nsfw').checked
+            };
             
-            // 显示加载状态
-            resultsDiv.style.display = 'block';
-            loadingDiv.style.display = 'block';
-            searchResults.innerHTML = '';
+            showSearchProgress();
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchParams)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayResults(data.data);
+                    addToSearchHistory(searchParams, data.data);
+                    showToast(`Found ${data.data.posts.length} posts!`, 'success');
+                } else {
+                    showToast(`Search failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Search error: ${error.message}`, 'error');
+            } finally {
+                hideSearchProgress();
+            }
+        }
+        
+        function displayResults(data) {
+            currentResults = data.posts;
+            const resultsGrid = document.getElementById('results-grid');
+            const resultsSection = document.getElementById('results-section');
+            const resultsSummary = document.getElementById('results-summary');
+            
+            resultsSummary.textContent = `Found ${data.posts.length} posts (${data.search_time}s)`;
+            
+            if (data.posts.length === 0) {
+                resultsGrid.innerHTML = '<div class="text-center py-5"><p class="text-muted">No posts found. Try different keywords or adjust your filters.</p></div>';
+            } else {
+                resultsGrid.innerHTML = data.posts.map(post => createPostCard(post)).join('');
+            }
+            
+            resultsSection.classList.remove('d-none');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function createPostCard(post) {
+            const isPromotional = post.is_promotional;
+            const promotionalBadge = isPromotional ? '<span class="badge bg-warning text-dark ms-2">Promotional</span>' : '';
+            const cardClass = isPromotional ? 'post-card promotional' : 'post-card';
+            
+            return `
+                <div class="card ${cardClass} mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${escapeHtml(post.title)}${promotionalBadge}</h5>
+                        <div class="row text-muted small mb-2">
+                            <div class="col-md-6">
+                                <i class="bi bi-person me-1"></i>u/${escapeHtml(post.author)}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-reddit me-1"></i>r/${escapeHtml(post.subreddit)}
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <i class="bi bi-arrow-up me-1"></i>${post.score}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-chat me-1"></i>${post.num_comments}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-clock me-1"></i>${formatDate(post.created_utc)}
+                            </div>
+                        </div>
+                        ${post.selftext ? `<p class="card-text">${escapeHtml(post.selftext.substring(0, 200))}${post.selftext.length > 200 ? '...' : ''}</p>` : ''}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                ${post.keywords_matched ? `<small class="text-muted">Matched: ${post.keywords_matched.join(', ')}</small>` : ''}
+                            </div>
+                            <a href="${post.url}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>View Post
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function collectPromotionalPosts() {
+            showSearchProgress('Collecting promotional posts...');
             
             try {
                 const response = await fetch('/api/search', {
@@ -238,60 +690,276 @@ HTML_TEMPLATE = """
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        keywords: keywords.split(',').map(k => k.trim()),
-                        subreddit: subreddit || null,
-                        limit: limit
+                        keywords: ['sale', 'discount', 'promo', 'deal', 'buy'],
+                        limit: 50
                     })
                 });
                 
                 const data = await response.json();
-                loadingDiv.style.display = 'none';
                 
                 if (data.status === 'success') {
-                    displayResults(data.data);
+                    const promotionalPosts = data.data.posts.filter(post => post.is_promotional);
+                    displayResults({
+                        posts: promotionalPosts,
+                        search_time: data.data.search_time
+                    });
+                    showToast(`Found ${promotionalPosts.length} promotional posts!`, 'success');
                 } else {
-                    searchResults.innerHTML = `<div class="error">搜索失败: ${data.message}</div>`;
+                    showToast(`Collection failed: ${data.message}`, 'error');
                 }
             } catch (error) {
-                loadingDiv.style.display = 'none';
-                searchResults.innerHTML = `<div class="error">搜索出错: ${error.message}</div>`;
+                showToast(`Collection error: ${error.message}`, 'error');
+            } finally {
+                hideSearchProgress();
             }
         }
         
-        function displayResults(data) {
-            const searchResults = document.getElementById('search-results');
+        function toggleHistorySection() {
+            const historySection = document.getElementById('history-section');
+            historySection.classList.toggle('d-none');
             
-            if (!data.posts || data.posts.length === 0) {
-                searchResults.innerHTML = '<div class="warning">未找到相关帖子</div>';
+            if (!historySection.classList.contains('d-none')) {
+                displaySearchHistory();
+                historySection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function displaySearchHistory() {
+            const historyGrid = document.getElementById('history-grid');
+            
+            if (searchHistory.length === 0) {
+                historyGrid.innerHTML = '<div class="text-center py-5"><p class="text-muted">No search history yet. Perform a search to see it here.</p></div>';
                 return;
             }
             
-            let html = `<h3>搜索结果 (${data.posts.length} 个帖子)</h3>`;
-            html += `<p><strong>搜索时间:</strong> ${data.search_time}秒</p>`;
-            
-            data.posts.forEach(post => {
-                const isPromotional = post.is_promotional ? '<span class="error">[推广]</span>' : '';
-                html += `
-                    <div class="post-item">
-                        <h4>${isPromotional} ${post.title}</h4>
-                        <p><strong>Subreddit:</strong> r/${post.subreddit}</p>
-                        <p><strong>作者:</strong> u/${post.author}</p>
-                        <p><strong>评分:</strong> ${post.score} | <strong>评论:</strong> ${post.num_comments}</p>
-                        <p><strong>时间:</strong> ${new Date(post.created_utc * 1000).toLocaleString()}</p>
-                        <p><strong>链接:</strong> <a href="${post.url}" target="_blank">查看原帖</a></p>
+            historyGrid.innerHTML = searchHistory.map((item, index) => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title mb-1">${item.params.keywords.join(', ')}</h6>
+                                <p class="card-text text-muted small mb-2">
+                                    ${item.results.posts.length} posts found • ${item.timestamp}
+                                </p>
+                                <div class="small text-muted">
+                                    Subreddit: ${item.params.subreddit || 'all'} • 
+                                    Time: ${item.params.time_filter} • 
+                                    Sort: ${item.params.sort}
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="replaySearch(${index})">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Replay
+                            </button>
+                        </div>
                     </div>
-                `;
-            });
-            
-            searchResults.innerHTML = html;
+                </div>
+            `).join('');
         }
         
-        // 回车键搜索
-        document.getElementById('keywords').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchReddit();
+        function replaySearch(index) {
+            const historyItem = searchHistory[index];
+            
+            // Fill form with previous search parameters
+            document.getElementById('keywords-input').value = historyItem.params.keywords.join(', ');
+            document.getElementById('subreddits-input').value = historyItem.params.subreddit || 'all';
+            document.getElementById('time-filter').value = historyItem.params.time_filter;
+            document.getElementById('sort-by').value = historyItem.params.sort;
+            document.getElementById('limit-input').value = historyItem.params.limit;
+            document.getElementById('min-score').value = historyItem.params.min_score;
+            document.getElementById('min-comments').value = historyItem.params.min_comments;
+            document.getElementById('include-nsfw').checked = historyItem.params.include_nsfw;
+            
+            // Scroll to search form
+            document.getElementById('hero-section').scrollIntoView({ behavior: 'smooth' });
+            
+            showToast('Search parameters loaded from history', 'info');
+        }
+        
+        function addToSearchHistory(params, results) {
+            const historyItem = {
+                params: params,
+                results: results,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            searchHistory.unshift(historyItem);
+            
+            // Keep only last 10 searches
+            if (searchHistory.length > 10) {
+                searchHistory = searchHistory.slice(0, 10);
             }
-        });
+            
+            // Save to localStorage
+            localStorage.setItem('reddit_search_history', JSON.stringify(searchHistory));
+        }
+        
+        function loadSearchHistory() {
+            const saved = localStorage.getItem('reddit_search_history');
+            if (saved) {
+                try {
+                    searchHistory = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to load search history:', e);
+                    searchHistory = [];
+                }
+            }
+        }
+        
+        function clearHistory() {
+            searchHistory = [];
+            localStorage.removeItem('reddit_search_history');
+            displaySearchHistory();
+            showToast('Search history cleared', 'info');
+        }
+        
+        function clearResults() {
+            currentResults = [];
+            document.getElementById('results-section').classList.add('d-none');
+            showToast('Results cleared', 'info');
+        }
+        
+        function exportCurrentResults() {
+            if (currentResults.length === 0) {
+                showToast('No results to export', 'warning');
+                return;
+            }
+            
+            const csv = convertToCSV(currentResults);
+            downloadFile(csv, 'reddit_search_results.csv', 'text/csv');
+            showToast('Results exported successfully!', 'success');
+        }
+        
+        function convertToCSV(data) {
+            const headers = ['Title', 'Author', 'Subreddit', 'Score', 'Comments', 'URL', 'Is Promotional', 'Created'];
+            const rows = data.map(post => [
+                `"${post.title.replace(/"/g, '""')}"`,
+                post.author,
+                post.subreddit,
+                post.score,
+                post.num_comments,
+                post.url,
+                post.is_promotional ? 'Yes' : 'No',
+                formatDate(post.created_utc)
+            ]);
+            
+            return [headers.join(','), ...rows.map(row => row.join(','))].join('\\n');
+        }
+        
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        async function checkRedditAPIStatus() {
+            try {
+                const response = await fetch('/api/reddit/test');
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('reddit-api-status');
+                if (data.status === 'success') {
+                    statusElement.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <span>Status:</span>
+                            <span class="badge bg-success">Connected</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>Mode:</span>
+                            <span class="fw-bold">${data.mode || 'Read-only'}</span>
+                        </div>
+                    `;
+                } else {
+                    statusElement.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <span>Status:</span>
+                            <span class="badge bg-warning">Not Configured</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>Mode:</span>
+                            <span class="fw-bold">Offline</span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to check Reddit API status:', error);
+            }
+        }
+        
+        function showSearchProgress(message = 'Searching Reddit...') {
+            document.getElementById('status-title').textContent = message;
+            document.getElementById('status-message').textContent = 'Please wait while we collect data from Reddit';
+            document.getElementById('status-bar').classList.remove('d-none');
+            
+            // Update search button
+            const searchBtn = document.querySelector('.search-btn-text');
+            const searchSpinner = document.querySelector('.search-btn-spinner');
+            searchBtn.classList.add('d-none');
+            searchSpinner.classList.remove('d-none');
+        }
+        
+        function hideSearchProgress() {
+            document.getElementById('status-bar').classList.add('d-none');
+            
+            // Reset search button
+            const searchBtn = document.querySelector('.search-btn-text');
+            const searchSpinner = document.querySelector('.search-btn-spinner');
+            searchBtn.classList.remove('d-none');
+            searchSpinner.classList.add('d-none');
+        }
+        
+        function hideStatusBar() {
+            document.getElementById('status-bar').classList.add('d-none');
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const bgClass = {
+                'success': 'bg-success',
+                'error': 'bg-danger',
+                'warning': 'bg-warning',
+                'info': 'bg-info'
+            }[type] || 'bg-info';
+            
+            const toastHtml = `
+                <div id="${toastId}" class="toast ${bgClass} text-white" role="alert">
+                    <div class="toast-body">
+                        ${escapeHtml(message)}
+                        <button type="button" class="btn-close btn-close-white float-end" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
     </script>
 </body>
 </html>
@@ -299,18 +967,59 @@ HTML_TEMPLATE = """
 
 @app.route('/')
 def home():
-    """主页"""
+    """主页 - 显示完整功能界面"""
     try:
-        return render_template_string(HTML_TEMPLATE, timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC'))
+        # 检查Reddit API状态
+        reddit_status = "Not Configured"
+        reddit_status_color = "warning"
+        reddit_mode = "Offline"
+        
+        client_id = os.environ.get('REDDIT_CLIENT_ID')
+        client_secret = os.environ.get('REDDIT_CLIENT_SECRET')
+        
+        if client_id and client_secret:
+            try:
+                # 测试Reddit API连接
+                import praw
+                reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+                )
+                
+                # 简单测试
+                subreddit = reddit.subreddit('test')
+                list(subreddit.hot(limit=1))
+                
+                reddit_status = "Connected"
+                reddit_status_color = "success"
+                reddit_mode = "Read-only"
+                
+            except Exception as e:
+                logger.warning(f"Reddit API test failed: {e}")
+                reddit_status = "Error"
+                reddit_status_color = "danger"
+                reddit_mode = "Failed"
+        
+        return render_template_string(
+            COMPLETE_HTML_TEMPLATE,
+            system_status="Operational",
+            reddit_status=reddit_status,
+            reddit_status_color=reddit_status_color,
+            reddit_mode=reddit_mode,
+            timestamp=datetime.now().strftime('%Y-%m-%d')
+        )
+        
     except Exception as e:
         logger.error(f"Error rendering home page: {e}")
-        return jsonify({
-            "status": "ok",
-            "message": "Reddit Data Collector - Vercel Enhanced",
-            "timestamp": datetime.now().isoformat(),
-            "environment": "Vercel",
-            "note": "Enhanced version with full functionality"
-        })
+        return render_template_string(
+            COMPLETE_HTML_TEMPLATE,
+            system_status="Error",
+            reddit_status="Unknown",
+            reddit_status_color="secondary",
+            reddit_mode="Unknown",
+            timestamp=datetime.now().strftime('%Y-%m-%d')
+        )
 
 @app.route('/api/health')
 def health():
@@ -319,9 +1028,9 @@ def health():
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "environment": "Vercel",
-        "version": "2.0-enhanced",
+        "version": "2.0-complete",
         "uptime": "Running",
-        "features": ["reddit_search", "promotional_detection", "api_endpoints"]
+        "features": ["reddit_search", "promotional_detection", "full_interface"]
     })
 
 @app.route('/api/status')
@@ -329,28 +1038,32 @@ def status():
     """系统状态端点"""
     return jsonify({
         "status": "ok",
-        "application": "Reddit Data Collector Enhanced",
+        "application": "Reddit Data Collector Complete",
         "environment": "Vercel",
-        "version": "2.0-enhanced",
+        "version": "2.0-complete",
         "timestamp": datetime.now().isoformat(),
         "features": {
             "reddit_api": "available",
             "search": "enabled",
             "promotional_detection": "enabled",
-            "web_interface": "enabled"
+            "web_interface": "complete",
+            "export": "enabled",
+            "history": "enabled"
         },
         "capabilities": [
             "Real-time Reddit search",
             "Multi-keyword support",
             "Promotional content detection",
-            "RESTful API",
-            "Modern web interface"
+            "Complete web interface",
+            "Search history",
+            "Data export",
+            "Advanced filtering"
         ]
     })
 
 @app.route('/api/search', methods=['POST'])
 def search_reddit():
-    """Reddit搜索端点"""
+    """Reddit搜索端点 - 完整功能"""
     try:
         data = request.get_json()
         if not data:
@@ -362,7 +1075,12 @@ def search_reddit():
         
         keywords = data.get('keywords', [])
         subreddit = data.get('subreddit')
-        limit = min(data.get('limit', 10), 100)  # 限制最大100个结果
+        limit = min(data.get('limit', 10), 100)
+        time_filter = data.get('time_filter', 'week')
+        sort = data.get('sort', 'relevance')
+        min_score = data.get('min_score', 0)
+        min_comments = data.get('min_comments', 0)
+        include_nsfw = data.get('include_nsfw', False)
         
         if not keywords:
             return jsonify({
@@ -378,13 +1096,14 @@ def search_reddit():
         if not client_id or not client_secret:
             return jsonify({
                 "status": "error",
-                "message": "Reddit API credentials not configured",
-                "timestamp": datetime.now().isoformat()
+                "message": "Reddit API credentials not configured in Vercel environment variables",
+                "timestamp": datetime.now().isoformat(),
+                "help": "Please configure REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET in Vercel project settings"
             }), 400
         
         # 执行Reddit搜索
         search_start = datetime.now()
-        posts = perform_reddit_search(keywords, subreddit, limit)
+        posts = perform_reddit_search(keywords, subreddit, limit, time_filter, sort, min_score, min_comments, include_nsfw)
         search_time = (datetime.now() - search_start).total_seconds()
         
         return jsonify({
@@ -395,7 +1114,14 @@ def search_reddit():
                 "search_time": round(search_time, 2),
                 "keywords": keywords,
                 "subreddit": subreddit,
-                "limit": limit
+                "limit": limit,
+                "filters": {
+                    "time_filter": time_filter,
+                    "sort": sort,
+                    "min_score": min_score,
+                    "min_comments": min_comments,
+                    "include_nsfw": include_nsfw
+                }
             },
             "timestamp": datetime.now().isoformat()
         })
@@ -408,8 +1134,8 @@ def search_reddit():
             "timestamp": datetime.now().isoformat()
         }), 500
 
-def perform_reddit_search(keywords, subreddit=None, limit=10):
-    """执行Reddit搜索"""
+def perform_reddit_search(keywords, subreddit=None, limit=10, time_filter='week', sort='relevance', min_score=0, min_comments=0, include_nsfw=False):
+    """执行Reddit搜索 - 增强版"""
     try:
         import praw
         
@@ -424,13 +1150,28 @@ def perform_reddit_search(keywords, subreddit=None, limit=10):
         search_query = ' OR '.join(keywords)
         
         # 选择搜索范围
-        if subreddit:
+        if subreddit and subreddit.lower() != 'all':
             search_target = reddit.subreddit(subreddit)
         else:
             search_target = reddit.subreddit('all')
         
         # 执行搜索
-        for submission in search_target.search(search_query, limit=limit, sort='relevance'):
+        search_results = search_target.search(
+            search_query, 
+            limit=limit, 
+            sort=sort,
+            time_filter=time_filter
+        )
+        
+        for submission in search_results:
+            # 应用过滤器
+            if submission.score < min_score:
+                continue
+            if submission.num_comments < min_comments:
+                continue
+            if not include_nsfw and submission.over_18:
+                continue
+            
             # 推广内容检测
             is_promotional = detect_promotional_content(submission.title, submission.selftext)
             
@@ -443,9 +1184,10 @@ def perform_reddit_search(keywords, subreddit=None, limit=10):
                 "num_comments": submission.num_comments,
                 "created_utc": submission.created_utc,
                 "url": submission.url,
-                "selftext": submission.selftext[:200] + "..." if len(submission.selftext) > 200 else submission.selftext,
+                "selftext": submission.selftext,
                 "is_promotional": is_promotional,
-                "keywords_matched": [kw for kw in keywords if kw.lower() in submission.title.lower() or kw.lower() in submission.selftext.lower()]
+                "keywords_matched": [kw for kw in keywords if kw.lower() in submission.title.lower() or kw.lower() in submission.selftext.lower()],
+                "over_18": submission.over_18
             }
             posts.append(post_data)
         
@@ -456,19 +1198,43 @@ def perform_reddit_search(keywords, subreddit=None, limit=10):
         raise
 
 def detect_promotional_content(title, content):
-    """简单的推广内容检测"""
+    """增强的推广内容检测"""
     promotional_keywords = [
+        # 英文关键词
         'buy', 'sale', 'discount', 'promo', 'deal', 'offer', 'free shipping',
-        'limited time', 'click here', 'visit our', 'check out our',
-        '购买', '销售', '折扣', '促销', '优惠', '免费', '限时', '点击'
+        'limited time', 'click here', 'visit our', 'check out our', 'shop now',
+        'special offer', 'save money', 'best price', 'coupon', 'voucher',
+        'affiliate', 'sponsored', 'advertisement', 'ad', 'promotion',
+        # 中文关键词
+        '购买', '销售', '折扣', '促销', '优惠', '免费', '限时', '点击',
+        '特价', '打折', '便宜', '代购', '微商', '推广'
+    ]
+    
+    # 推广模式
+    promotional_patterns = [
+        r'\b\d+%\s*off\b',  # "50% off"
+        r'\$\d+',           # "$99"
+        r'free\s+shipping', # "free shipping"
+        r'buy\s+now',       # "buy now"
+        r'click\s+here',    # "click here"
+        r'visit\s+our',     # "visit our"
     ]
     
     text = (title + ' ' + content).lower()
-    return any(keyword in text for keyword in promotional_keywords)
+    
+    # 检查关键词
+    keyword_matches = sum(1 for keyword in promotional_keywords if keyword in text)
+    
+    # 检查模式
+    import re
+    pattern_matches = sum(1 for pattern in promotional_patterns if re.search(pattern, text))
+    
+    # 如果有多个匹配或者有模式匹配，认为是推广内容
+    return keyword_matches >= 2 or pattern_matches >= 1
 
 @app.route('/api/reddit/test')
 def reddit_test():
-    """Reddit API连接测试"""
+    """Reddit API连接测试 - 增强版"""
     try:
         # 检查环境变量
         client_id = os.environ.get('REDDIT_CLIENT_ID')
@@ -478,6 +1244,7 @@ def reddit_test():
             return jsonify({
                 "status": "error",
                 "message": "Reddit API credentials not configured",
+                "help": "Please set REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET environment variables in Vercel",
                 "timestamp": datetime.now().isoformat()
             }), 400
         
@@ -501,6 +1268,7 @@ def reddit_test():
                 "mode": "read-only",
                 "test_result": f"Successfully accessed r/test subreddit",
                 "posts_found": len(posts),
+                "client_id_preview": client_id[:8] + "..." if len(client_id) > 8 else client_id,
                 "timestamp": datetime.now().isoformat()
             })
             
@@ -528,7 +1296,13 @@ def not_found(error):
         "status": "error",
         "message": "Endpoint not found",
         "timestamp": datetime.now().isoformat(),
-        "available_endpoints": ["/", "/api/health", "/api/status", "/api/info", "/api/test"]
+        "available_endpoints": [
+            "/", 
+            "/api/health", 
+            "/api/status", 
+            "/api/search", 
+            "/api/reddit/test"
+        ]
     }), 404
 
 @app.errorhandler(500)
