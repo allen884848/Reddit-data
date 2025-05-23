@@ -1,29 +1,26 @@
 {
   "version": 2,
   "name": "reddit-data-collector",
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "app.py"
+      "dest": "/api/index.py"
     }
   ],
   "env": {
     "FLASK_ENV": "production",
-    "PYTHONPATH": "."
-  },
-  "functions": {
-    "app.py": {
-      "maxDuration": 30
-    }
+    "PYTHONPATH": ".",
+    "VERCEL": "1"
   },
   "regions": ["hkg1", "sin1", "sfo1"]
 } 
