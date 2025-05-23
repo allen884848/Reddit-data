@@ -33,7 +33,11 @@ from typing import Dict, Any, List, Optional
 import traceback
 
 # Import our custom modules
-from config import get_config, REDDIT_CONFIG, LOGGING_CONFIG, SECURITY_CONFIG, DATABASE_CONFIG
+from config import (
+    REDDIT_CONFIG, REDDIT_RATE_LIMIT, DATABASE_CONFIG, SEARCH_CONFIG,
+    PROMOTIONAL_DETECTION, LOGGING_CONFIG, EXPORT_CONFIG, SECURITY_CONFIG,
+    get_config
+)
 from database import get_database_manager, RedditPost, SearchHistory
 from reddit_scraper import (
     RedditScraper, SearchParameters, create_search_parameters, 

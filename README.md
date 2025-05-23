@@ -2,10 +2,37 @@
 
 **A comprehensive, production-ready web application for collecting, analyzing, and managing Reddit data with advanced promotional content detection and modern web interface.**
 
+## 🌟 **LIVE DEMO - NOW AVAILABLE!**
+
+**🚀 Production Website**: [https://reddit-data-green.vercel.app/](https://reddit-data-green.vercel.app/)
+
+**✅ Project Status**: **FULLY DEPLOYED & OPERATIONAL**
+
+### 🎉 What's New - Enhanced Vercel Deployment
+
+The Reddit Data Collector is now live on Vercel with enhanced features:
+
+- **🌐 Real-time Reddit Search**: Search Reddit posts instantly with multiple keywords
+- **🎨 Modern Web Interface**: Beautiful, responsive design that works on all devices  
+- **🛡️ AI Content Detection**: Automatic identification of promotional content
+- **📊 Interactive Dashboard**: Live search results with detailed post information
+- **⚡ Serverless Architecture**: Fast, scalable deployment on Vercel platform
+- **🔗 RESTful API**: Complete API endpoints for programmatic access
+
+### 🚀 Quick Test
+
+Try it now! Visit [https://reddit-data-green.vercel.app/](https://reddit-data-green.vercel.app/) and:
+1. Enter keywords like "python, programming" 
+2. Click the search button
+3. See real-time Reddit data collection in action!
+
+---
+
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
 [![Bootstrap 5](https://img.shields.io/badge/bootstrap-5.3+-purple.svg)](https://getbootstrap.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Vercel](https://img.shields.io/badge/deployed-vercel-black.svg)](https://reddit-data-green.vercel.app/)
 
 ---
 
