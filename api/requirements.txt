@@ -1,0 +1,17 @@
+# Vercel API函数依赖文件
+# 位置：api/requirements.txt
+
+# Web框架 - 使用稳定版本
+Flask==2.3.3
+
+# Reddit API - 核心功能
+praw==7.7.1
+
+# HTTP请求库
+requests==2.31.0
+
+# 环境变量处理
+python-dotenv==1.0.0
+
+# 日期时间处理
+python-dateutil==2.8.2 

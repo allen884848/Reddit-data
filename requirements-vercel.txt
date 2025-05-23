@@ -1,24 +1,28 @@
-# Vercel Deployment Requirements
-# ==============================
-# Minimal dependencies for Vercel serverless deployment
+# Vercel部署专用依赖文件 - 精简版
+# 只包含核心功能所需的稳定依赖包
 
-# Core Flask Framework
-Flask==3.0.0
-Werkzeug==3.0.1
+# Web框架
+Flask==2.3.3
+Werkzeug==2.3.7
 
-# Reddit API Integration
-praw==7.8.1
-prawcore==2.4.0
+# Reddit API
+praw==7.7.1
 
-# Data Processing (Essential only)
-pandas==2.1.4
+# HTTP请求
 requests==2.31.0
+urllib3==2.0.7
 
-# Environment Configuration
+# 环境变量
 python-dotenv==1.0.0
 
-# Date/Time Processing
+# 数据处理
 python-dateutil==2.8.2
 
-# Basic Security
-bleach==6.1.0 
+# JSON处理 (Python内置，但某些环境可能需要)
+# 移除了可能导致冲突的包：
+# - pandas (太大，可能导致安装失败)
+# - numpy (在无服务器环境中可能有问题)
+# - matplotlib (图形库，Vercel不需要)
+# - seaborn (数据可视化，Vercel不需要)
+# - jupyter相关包 (开发工具，生产环境不需要)
+# - pytest相关包 (测试工具，生产环境不需要) 

@@ -1,6 +1,15 @@
 {
   "version": 2,
   "name": "reddit-data-collector",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
