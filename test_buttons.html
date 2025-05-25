@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>按钮测试页面</title>
+    <title>Button Test - Reddit Data Collector</title>
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #ff4500, #ff6b35);
-            color: white;
-            padding: 4rem 0;
+        :root {
+            --primary-color: #ff4500;
         }
-        
+
+        body {
+            background: linear-gradient(135deg, #ff4500, #ff6b35);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
         .quick-actions {
             padding: 1.5rem 0;
         }
@@ -20,59 +29,187 @@
         .quick-actions .btn {
             background-color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            color: #ff4500;
+            color: var(--primary-color);
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            border-radius: 25px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .quick-actions .btn:hover {
             background-color: white;
             border-color: white;
-            color: #ff4500;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .quick-actions .btn i {
-            font-size: 1em;
+        /* 特殊按钮样式 */
+        #collect-reddit-promoted-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border-color: #dc3545;
+            color: white;
+            font-weight: 600;
+        }
+
+        #collect-reddit-promoted-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            border-color: #c82333;
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        #collect-promotional-btn {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            border-color: #ffc107;
+            color: #212529;
+            font-weight: 600;
+        }
+
+        #collect-promotional-btn:hover {
+            background: linear-gradient(135deg, #e0a800, #d39e00);
+            border-color: #e0a800;
+            color: #212529;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        #view-history-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            border-color: #6c757d;
+            color: white;
+            font-weight: 500;
+        }
+
+        #view-history-btn:hover {
+            background: linear-gradient(135deg, #5a6268, #495057);
+            border-color: #5a6268;
+            color: white;
+        }
+
+        #export-data-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border-color: #28a745;
+            color: white;
+            font-weight: 500;
+        }
+
+        #export-data-btn:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            border-color: #1e7e34;
+            color: white;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 576px) {
+            .quick-actions .btn {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .quick-actions .row {
+                margin: 0 -0.25rem;
+            }
+            
+            .quick-actions .row > div {
+                padding: 0 0.25rem;
+            }
+        }
+
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="hero-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="text-center mb-5">
-                        <h1 class="display-4 fw-light mb-3">按钮测试页面</h1>
-                        <p class="lead">测试三个快速操作按钮是否正确显示</p>
-                    </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="test-container">
+                    <h1 class="text-center mb-4">Reddit Data Collector - Button Test</h1>
                     
                     <!-- Quick Action Buttons -->
                     <div class="quick-actions mt-4">
                         <div class="row g-2 justify-content-center">
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-light btn-sm" onclick="testButton1()">
+                            <div class="col-6 col-sm-auto">
+                                <button type="button" 
+                                        class="btn btn-light btn-sm w-100" 
+                                        id="collect-promotional-btn"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="收集基于内容分析的推广帖子（关键词、模式匹配）">
                                     <i class="bi bi-bullseye me-1"></i>
-                                    Collect Promotional Posts
+                                    <span class="d-none d-sm-inline">General </span>Promotional
                                 </button>
                             </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-light btn-sm" onclick="testButton2()">
+                            <div class="col-6 col-sm-auto">
+                                <button type="button" 
+                                        class="btn btn-light btn-sm w-100" 
+                                        id="collect-reddit-promoted-btn"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
+                                    <i class="bi bi-badge-ad me-1"></i>
+                                    <span class="d-none d-sm-inline">Reddit </span>Promoted
+                                </button>
+                            </div>
+                            <div class="col-6 col-sm-auto">
+                                <button type="button" 
+                                        class="btn btn-light btn-sm w-100" 
+                                        id="view-history-btn"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="查看搜索历史记录">
                                     <i class="bi bi-clock-history me-1"></i>
-                                    View History
+                                    <span class="d-none d-sm-inline">View </span>History
                                 </button>
                             </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-light btn-sm" onclick="testButton3()">
+                            <div class="col-6 col-sm-auto">
+                                <button type="button" 
+                                        class="btn btn-light btn-sm w-100" 
+                                        id="export-data-btn"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="导出当前搜索结果">
                                     <i class="bi bi-download me-1"></i>
-                                    Export Data
+                                    <span class="d-none d-sm-inline">Export </span>Data
                                 </button>
                             </div>
+                        </div>
+                        
+                        <!-- 功能说明 -->
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Reddit Promoted</strong> detects official Reddit ads • 
+                                <strong>General Promotional</strong> detects content-based promotions
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>测试说明：</h5>
+                        <ul>
+                            <li><strong>Reddit Promoted</strong> 按钮：红色渐变，用于收集Reddit官方推广帖子</li>
+                            <li><strong>General Promotional</strong> 按钮：黄色渐变，用于收集一般推广内容</li>
+                            <li><strong>View History</strong> 按钮：灰色渐变，查看搜索历史</li>
+                            <li><strong>Export Data</strong> 按钮：绿色渐变，导出数据</li>
+                            <li>所有按钮都有hover效果和tooltip提示</li>
+                            <li>在小屏幕上会自动调整布局</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>点击测试：</h5>
+                        <div id="test-output" class="alert alert-info">
+                            点击上面的按钮测试功能...
                         </div>
                     </div>
                 </div>
@@ -80,36 +217,34 @@
         </div>
     </div>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <h3>测试结果：</h3>
-                <div id="test-results" class="alert alert-info">
-                    点击上面的按钮来测试功能...
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        function testButton1() {
-            document.getElementById('test-results').innerHTML = 
-                '<strong>✅ 按钮1 (Collect Promotional Posts) 工作正常！</strong><br>' +
-                '这个按钮会调用 /api/collect-promotional 端点来收集推广内容。';
-        }
-        
-        function testButton2() {
-            document.getElementById('test-results').innerHTML = 
-                '<strong>✅ 按钮2 (View History) 工作正常！</strong><br>' +
-                '这个按钮会调用 /api/history 端点来显示搜索历史。';
-        }
-        
-        function testButton3() {
-            document.getElementById('test-results').innerHTML = 
-                '<strong>✅ 按钮3 (Export Data) 工作正常！</strong><br>' +
-                '这个按钮会调用 /api/export 端点来导出数据。';
-        }
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Add click handlers for testing
+            document.getElementById('collect-promotional-btn').addEventListener('click', function() {
+                document.getElementById('test-output').innerHTML = '🟡 <strong>General Promotional</strong> 按钮被点击！<br>功能：收集基于内容分析的推广帖子';
+            });
+
+            document.getElementById('collect-reddit-promoted-btn').addEventListener('click', function() {
+                document.getElementById('test-output').innerHTML = '🔴 <strong>Reddit Promoted</strong> 按钮被点击！<br>功能：收集Reddit官方推广帖子（Promoted/Sponsored标记）';
+            });
+
+            document.getElementById('view-history-btn').addEventListener('click', function() {
+                document.getElementById('test-output').innerHTML = '⚫ <strong>View History</strong> 按钮被点击！<br>功能：查看搜索历史记录';
+            });
+
+            document.getElementById('export-data-btn').addEventListener('click', function() {
+                document.getElementById('test-output').innerHTML = '🟢 <strong>Export Data</strong> 按钮被点击！<br>功能：导出当前搜索结果';
+            });
+        });
     </script>
 </body>
 </html> 
