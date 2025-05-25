@@ -113,6 +113,16 @@ COMPLETE_HTML_TEMPLATE = """
             background-color: #fff8e1;
         }
 
+        .post-card.reddit-promoted {
+            border-left-color: var(--danger-color);
+            background-color: #ffebee;
+            border: 2px solid #ffcdd2;
+        }
+
+        .post-card.reddit-promoted .card-title {
+            color: #c62828;
+        }
+
         .status-section {
             padding: 2rem 0;
         }
@@ -168,23 +178,97 @@ COMPLETE_HTML_TEMPLATE = """
             border: 1px solid rgba(255, 255, 255, 0.8);
             color: var(--primary-color);
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            border-radius: 25px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .quick-actions .btn:hover {
             background-color: white;
             border-color: white;
             color: var(--primary-color);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .quick-actions .btn i {
             font-size: 1em;
+        }
+
+        /* 特殊按钮样式 */
+        #collect-reddit-promoted-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border-color: #dc3545;
+            color: white;
+            font-weight: 600;
+        }
+
+        #collect-reddit-promoted-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            border-color: #c82333;
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        #collect-promotional-btn {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            border-color: #ffc107;
+            color: #212529;
+            font-weight: 600;
+        }
+
+        #collect-promotional-btn:hover {
+            background: linear-gradient(135deg, #e0a800, #d39e00);
+            border-color: #e0a800;
+            color: #212529;
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        #view-history-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            border-color: #6c757d;
+            color: white;
+            font-weight: 500;
+        }
+
+        #view-history-btn:hover {
+            background: linear-gradient(135deg, #5a6268, #495057);
+            border-color: #5a6268;
+            color: white;
+        }
+
+        #export-data-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border-color: #28a745;
+            color: white;
+            font-weight: 500;
+        }
+
+        #export-data-btn:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            border-color: #1e7e34;
+            color: white;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 576px) {
+            .quick-actions .btn {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .quick-actions .row {
+                margin: 0 -0.25rem;
+            }
+            
+            .quick-actions .row > div {
+                padding: 0 0.25rem;
+            }
         }
     </style>
     
@@ -341,24 +425,59 @@ COMPLETE_HTML_TEMPLATE = """
                             <!-- Quick Action Buttons -->
                             <div class="quick-actions mt-4">
                                 <div class="row g-2 justify-content-center">
-                                    <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-sm" id="collect-promotional-btn">
+                                    <div class="col-6 col-sm-auto">
+                                        <button type="button" 
+                                                class="btn btn-light btn-sm w-100" 
+                                                id="collect-promotional-btn"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="收集基于内容分析的推广帖子（关键词、模式匹配）">
                                             <i class="bi bi-bullseye me-1"></i>
-                                            Collect Promotional Posts
+                                            <span class="d-none d-sm-inline">General </span>Promotional
                                         </button>
                                     </div>
-                                    <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-sm" id="view-history-btn">
+                                    <div class="col-6 col-sm-auto">
+                                        <button type="button" 
+                                                class="btn btn-light btn-sm w-100" 
+                                                id="collect-reddit-promoted-btn"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
+                                            <i class="bi bi-badge-ad me-1"></i>
+                                            <span class="d-none d-sm-inline">Reddit </span>Promoted
+                                        </button>
+                                    </div>
+                                    <div class="col-6 col-sm-auto">
+                                        <button type="button" 
+                                                class="btn btn-light btn-sm w-100" 
+                                                id="view-history-btn"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="查看搜索历史记录">
                                             <i class="bi bi-clock-history me-1"></i>
-                                            View History
+                                            <span class="d-none d-sm-inline">View </span>History
                                         </button>
                                     </div>
-                                    <div class="col-auto">
-                                        <button type="button" class="btn btn-light btn-sm" id="export-data-btn">
+                                    <div class="col-6 col-sm-auto">
+                                        <button type="button" 
+                                                class="btn btn-light btn-sm w-100" 
+                                                id="export-data-btn"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="导出当前搜索结果">
                                             <i class="bi bi-download me-1"></i>
-                                            Export Data
+                                            <span class="d-none d-sm-inline">Export </span>Data
                                         </button>
                                     </div>
+                                </div>
+                                
+                                <!-- 功能说明 -->
+                                <div class="text-center mt-3">
+                                    <small class="text-white-50">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <strong>Reddit Promoted</strong> detects official Reddit ads • 
+                                        <strong>General Promotional</strong> detects content-based promotions
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -586,9 +705,16 @@ COMPLETE_HTML_TEMPLATE = """
         });
         
         function initializeApp() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
             // Bind event listeners
             document.getElementById('search-form').addEventListener('submit', handleSearch);
             document.getElementById('collect-promotional-btn').addEventListener('click', collectPromotionalPosts);
+            document.getElementById('collect-reddit-promoted-btn').addEventListener('click', collectRedditPromotedPosts);
             document.getElementById('view-history-btn').addEventListener('click', toggleHistorySection);
             document.getElementById('export-data-btn').addEventListener('click', exportCurrentResults);
             document.getElementById('clear-results-btn').addEventListener('click', clearResults);
@@ -673,13 +799,30 @@ COMPLETE_HTML_TEMPLATE = """
         
         function createPostCard(post) {
             const isPromotional = post.is_promotional;
-            const promotionalBadge = isPromotional ? '<span class="badge bg-warning text-dark ms-2">Promotional</span>' : '';
-            const cardClass = isPromotional ? 'post-card promotional' : 'post-card';
+            const isRedditPromoted = post.reddit_promoted;
+            
+            // 推广标记
+            let promotionalBadges = '';
+            if (isRedditPromoted) {
+                promotionalBadges += '<span class="badge bg-danger text-white ms-2">Reddit Promoted</span>';
+            }
+            if (isPromotional && !isRedditPromoted) {
+                promotionalBadges += '<span class="badge bg-warning text-dark ms-2">Promotional Content</span>';
+            }
+            
+            // 推广指示器
+            let promotionalIndicators = '';
+            if (post.promoted_indicators && post.promoted_indicators.length > 0) {
+                promotionalIndicators = `<small class="text-muted">Promotion indicators: ${post.promoted_indicators.join(', ')}</small><br>`;
+            }
+            
+            const cardClass = isRedditPromoted ? 'post-card reddit-promoted' : 
+                             (isPromotional ? 'post-card promotional' : 'post-card');
             
             return `
                 <div class="card ${cardClass} mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">${escapeHtml(post.title)}${promotionalBadge}</h5>
+                        <h5 class="card-title">${escapeHtml(post.title)}${promotionalBadges}</h5>
                         <div class="row text-muted small mb-2">
                             <div class="col-md-6">
                                 <i class="bi bi-person me-1"></i>u/${escapeHtml(post.author)}
@@ -694,10 +837,12 @@ COMPLETE_HTML_TEMPLATE = """
                                 <i class="bi bi-clock me-1"></i>${formatDate(post.created_utc)}
                             </div>
                         </div>
+                        ${promotionalIndicators}
                         ${post.selftext ? `<p class="card-text">${escapeHtml(post.selftext.substring(0, 200))}${post.selftext.length > 200 ? '...' : ''}</p>` : ''}
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                ${post.keywords_matched ? `<small class="text-muted">Matched: ${post.keywords_matched.join(', ')}</small>` : ''}
+                                ${post.keywords_matched && post.keywords_matched.length > 0 ? `<small class="text-muted">Matched: ${post.keywords_matched.join(', ')}</small><br>` : ''}
+                                ${post.auth_mode ? `<small class="text-info">API Mode: ${post.auth_mode}</small>` : ''}
                             </div>
                             <a href="${post.url}" target="_blank" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-box-arrow-up-right me-1"></i>View Post
@@ -731,6 +876,39 @@ COMPLETE_HTML_TEMPLATE = """
                         search_time: data.data.search_time
                     });
                     showToast(`Found ${data.data.promotional_count} promotional posts out of ${data.data.total_found} total posts!`, 'success');
+                } else {
+                    showToast(`Collection failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Collection error: ${error.message}`, 'error');
+            } finally {
+                hideSearchProgress();
+            }
+        }
+        
+        async function collectRedditPromotedPosts() {
+            showSearchProgress('Collecting Reddit Promoted posts...');
+            
+            try {
+                const response = await fetch('/api/collect-reddit-promoted', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subreddits: ['entrepreneur', 'startups', 'business', 'marketing', 'deals'],
+                        limit: 50
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayResults({
+                        posts: data.data.posts,
+                        search_time: data.data.search_time
+                    });
+                    showToast(`Found ${data.data.reddit_promoted_count} Reddit Promoted posts out of ${data.data.total_found} total posts!`, 'success');
                 } else {
                     showToast(`Collection failed: ${data.message}`, 'error');
                 }
@@ -1261,17 +1439,190 @@ def search_reddit():
             "timestamp": datetime.now().isoformat()
         }), 500
 
+def detect_promotional_content(title, content, submission=None):
+    """增强的推广内容检测 - 重点检测Reddit官方推广标记"""
+    
+    # 首先检查Reddit官方推广标记 - 这是最重要的
+    is_reddit_promoted = False
+    promoted_indicators = []
+    
+    if submission:
+        try:
+            # 方法1: 检查submission的promoted属性
+            if hasattr(submission, 'promoted') and submission.promoted:
+                is_reddit_promoted = True
+                promoted_indicators.append("reddit_promoted_flag")
+            
+            # 方法2: 检查distinguished属性（Reddit官方标记）
+            if hasattr(submission, 'distinguished'):
+                if submission.distinguished == 'admin':
+                    is_reddit_promoted = True
+                    promoted_indicators.append("admin_distinguished")
+                elif submission.distinguished == 'moderator':
+                    promoted_indicators.append("mod_distinguished")
+            
+            # 方法3: 检查stickied属性（置顶帖子，可能是推广）
+            if hasattr(submission, 'stickied') and submission.stickied:
+                promoted_indicators.append("stickied_post")
+            
+            # 方法4: 检查is_promoted_content属性
+            if hasattr(submission, 'is_promoted_content') and submission.is_promoted_content:
+                is_reddit_promoted = True
+                promoted_indicators.append("is_promoted_content")
+            
+            # 方法5: 检查author是否为特殊推广账户
+            if hasattr(submission, 'author') and submission.author:
+                author_name = str(submission.author).lower()
+                if any(indicator in author_name for indicator in ['promoted', 'sponsored', 'ad_', '_ad']):
+                    is_reddit_promoted = True
+                    promoted_indicators.append("promotional_author")
+            
+            # 方法6: 检查subreddit类型
+            if hasattr(submission, 'subreddit'):
+                subreddit_name = submission.subreddit.display_name.lower()
+                if subreddit_name in ['promoted', 'ads', 'sponsored']:
+                    is_reddit_promoted = True
+                    promoted_indicators.append("promotional_subreddit")
+            
+            # 方法7: 检查URL是否为Reddit推广链接
+            if hasattr(submission, 'url') and submission.url:
+                url_lower = submission.url.lower()
+                if any(indicator in url_lower for indicator in ['redd.it/promoted', 'reddit.com/promoted', 'ads.reddit.com']):
+                    is_reddit_promoted = True
+                    promoted_indicators.append("promotional_url")
+            
+            # 方法8: 检查submission的特殊属性
+            if hasattr(submission, 'link_flair_text') and submission.link_flair_text:
+                flair_text = submission.link_flair_text.lower()
+                if any(indicator in flair_text for indicator in ['promoted', 'sponsored', 'ad']):
+                    is_reddit_promoted = True
+                    promoted_indicators.append("promotional_flair")
+            
+            # 方法9: 检查submission的CSS类或特殊标记
+            if hasattr(submission, 'link_flair_css_class') and submission.link_flair_css_class:
+                css_class = submission.link_flair_css_class.lower()
+                if any(indicator in css_class for indicator in ['promoted', 'sponsored', 'ad']):
+                    is_reddit_promoted = True
+                    promoted_indicators.append("promotional_css")
+            
+        except Exception as e:
+            logger.warning(f"Error checking Reddit promotion attributes: {e}")
+    
+    # 检查标题和内容中的推广标记
+    text = (title + ' ' + content).lower()
+    
+    # Reddit官方推广标记检测（标题中的明确标记）
+    reddit_official_markers = ['promoted', 'sponsored', '[ad]', '[sponsored]', '[promoted]']
+    for marker in reddit_official_markers:
+        if marker in title.lower():
+            is_reddit_promoted = True
+            promoted_indicators.append(f"title_marker_{marker}")
+    
+    # 如果检测到Reddit官方推广，直接返回
+    if is_reddit_promoted:
+        return True
+    
+    # 如果不是Reddit官方推广，继续检查一般推广内容
+    promotional_keywords = [
+        # 英文关键词
+        'buy', 'sale', 'discount', 'promo', 'deal', 'offer', 'free shipping',
+        'limited time', 'click here', 'visit our', 'check out our', 'shop now',
+        'special offer', 'save money', 'best price', 'coupon', 'voucher',
+        'affiliate', 'advertisement', 'promotion',
+        'get started', 'sign up', 'register', 'download now', 'try free',
+        # 中文关键词
+        '购买', '销售', '折扣', '促销', '优惠', '免费', '限时', '点击',
+        '特价', '打折', '便宜', '代购', '微商', '推广', '广告'
+    ]
+    
+    # 推广模式
+    promotional_patterns = [
+        r'\b\d+%\s*off\b',  # "50% off"
+        r'\$\d+',           # "$99"
+        r'free\s+shipping', # "free shipping"
+        r'buy\s+now',       # "buy now"
+        r'click\s+here',    # "click here"
+        r'visit\s+our',     # "visit our"
+        r'limited\s+time',  # "limited time"
+        r'special\s+offer', # "special offer"
+    ]
+    
+    # 检查关键词
+    keyword_matches = sum(1 for keyword in promotional_keywords if keyword in text)
+    
+    # 检查模式
+    import re
+    pattern_matches = sum(1 for pattern in promotional_patterns if re.search(pattern, text))
+    
+    # 推广内容判断逻辑
+    # 1. 多个关键词匹配
+    if keyword_matches >= 2:
+        return True
+    
+    # 2. 有推广模式匹配
+    if pattern_matches >= 1:
+        return True
+    
+    # 3. 单个强推广关键词
+    strong_promotional_keywords = ['advertisement', 'affiliate', 'promo code']
+    if any(keyword in text for keyword in strong_promotional_keywords):
+        return True
+    
+    return False
+
 def perform_reddit_search(keywords, subreddit=None, limit=10, time_filter='week', sort='relevance', min_score=0, min_comments=0, include_nsfw=False):
-    """执行Reddit搜索 - 增强版"""
+    """执行Reddit搜索 - 增强版，包含推广内容检测"""
     try:
         import praw
         
-        # 初始化Reddit客户端
-        reddit = praw.Reddit(
-            client_id=os.environ.get('REDDIT_CLIENT_ID'),
-            client_secret=os.environ.get('REDDIT_CLIENT_SECRET'),
-            user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
-        )
+        # 获取环境变量
+        client_id = os.environ.get('REDDIT_CLIENT_ID')
+        client_secret = os.environ.get('REDDIT_CLIENT_SECRET')
+        username = os.environ.get('REDDIT_USERNAME')
+        password = os.environ.get('REDDIT_PASSWORD')
+        
+        # 检查必需的凭据
+        if not client_id or not client_secret:
+            raise Exception("Reddit API credentials (REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET) not configured")
+        
+        # 初始化Reddit客户端 - 尝试多种认证方式
+        reddit = None
+        auth_mode = "unknown"
+        
+        try:
+            # 方式1: Script模式 (需要用户名和密码)
+            if username and password:
+                reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    username=username,
+                    password=password,
+                    user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+                )
+                # 测试认证
+                user = reddit.user.me()
+                auth_mode = f"script (authenticated as {user.name})"
+                logger.info(f"Reddit API authenticated in script mode as {user.name}")
+            else:
+                raise Exception("Username/password not provided, trying read-only mode")
+                
+        except Exception as script_error:
+            logger.warning(f"Script mode failed: {script_error}, trying read-only mode")
+            
+            # 方式2: 只读模式
+            try:
+                reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+                )
+                # 测试只读访问
+                test_subreddit = reddit.subreddit('test')
+                list(test_subreddit.hot(limit=1))
+                auth_mode = "read-only"
+                logger.info("Reddit API initialized in read-only mode")
+            except Exception as readonly_error:
+                raise Exception(f"Both script and read-only authentication failed. Script error: {script_error}. Read-only error: {readonly_error}")
         
         posts = []
         search_query = ' OR '.join(keywords)
@@ -1285,79 +1636,93 @@ def perform_reddit_search(keywords, subreddit=None, limit=10, time_filter='week'
         # 执行搜索
         search_results = search_target.search(
             search_query, 
-            limit=limit, 
+            limit=limit * 2,  # 获取更多结果以便过滤
             sort=sort,
             time_filter=time_filter
         )
         
+        processed_count = 0
         for submission in search_results:
-            # 应用过滤器
-            if submission.score < min_score:
+            if processed_count >= limit:
+                break
+                
+            try:
+                # 应用过滤器
+                if submission.score < min_score:
+                    continue
+                if submission.num_comments < min_comments:
+                    continue
+                if not include_nsfw and submission.over_18:
+                    continue
+                
+                # 增强的推广内容检测
+                is_promotional = detect_promotional_content(
+                    submission.title, 
+                    submission.selftext, 
+                    submission
+                )
+                
+                # 检测关键词匹配
+                keywords_matched = []
+                title_text = submission.title.lower()
+                content_text = submission.selftext.lower() if submission.selftext else ""
+                
+                for kw in keywords:
+                    if kw.lower() in title_text or kw.lower() in content_text:
+                        keywords_matched.append(kw)
+                
+                # 获取作者信息
+                author_name = str(submission.author) if submission.author else "[deleted]"
+                
+                # 检查是否为Reddit官方推广
+                reddit_promoted = False
+                promoted_indicators = []
+                
+                try:
+                    # 检查各种推广标记
+                    if hasattr(submission, 'distinguished') and submission.distinguished:
+                        promoted_indicators.append(f"distinguished: {submission.distinguished}")
+                    if hasattr(submission, 'stickied') and submission.stickied:
+                        promoted_indicators.append("stickied")
+                    if 'promoted' in submission.title.lower() or 'sponsored' in submission.title.lower():
+                        promoted_indicators.append("title_marked")
+                        reddit_promoted = True
+                    if '[ad]' in submission.title.lower() or '[sponsored]' in submission.title.lower():
+                        promoted_indicators.append("ad_tag")
+                        reddit_promoted = True
+                except:
+                    pass
+                
+                post_data = {
+                    "reddit_id": submission.id,
+                    "title": submission.title,
+                    "author": author_name,
+                    "subreddit": submission.subreddit.display_name,
+                    "score": submission.score,
+                    "num_comments": submission.num_comments,
+                    "created_utc": submission.created_utc,
+                    "url": submission.url,
+                    "selftext": submission.selftext[:500] if submission.selftext else "",  # 限制长度
+                    "is_promotional": is_promotional,
+                    "reddit_promoted": reddit_promoted,
+                    "promoted_indicators": promoted_indicators,
+                    "keywords_matched": keywords_matched,
+                    "over_18": submission.over_18,
+                    "auth_mode": auth_mode
+                }
+                posts.append(post_data)
+                processed_count += 1
+                
+            except Exception as post_error:
+                logger.warning(f"Error processing post {submission.id}: {post_error}")
                 continue
-            if submission.num_comments < min_comments:
-                continue
-            if not include_nsfw and submission.over_18:
-                continue
-            
-            # 推广内容检测
-            is_promotional = detect_promotional_content(submission.title, submission.selftext)
-            
-            post_data = {
-                "reddit_id": submission.id,
-                "title": submission.title,
-                "author": str(submission.author) if submission.author else "[deleted]",
-                "subreddit": submission.subreddit.display_name,
-                "score": submission.score,
-                "num_comments": submission.num_comments,
-                "created_utc": submission.created_utc,
-                "url": submission.url,
-                "selftext": submission.selftext,
-                "is_promotional": is_promotional,
-                "keywords_matched": [kw for kw in keywords if kw.lower() in submission.title.lower() or kw.lower() in submission.selftext.lower()],
-                "over_18": submission.over_18
-            }
-            posts.append(post_data)
         
+        logger.info(f"Reddit search completed: {len(posts)} posts found using {auth_mode} mode")
         return posts
         
     except Exception as e:
         logger.error(f"Reddit search error: {e}")
         raise
-
-def detect_promotional_content(title, content):
-    """增强的推广内容检测"""
-    promotional_keywords = [
-        # 英文关键词
-        'buy', 'sale', 'discount', 'promo', 'deal', 'offer', 'free shipping',
-        'limited time', 'click here', 'visit our', 'check out our', 'shop now',
-        'special offer', 'save money', 'best price', 'coupon', 'voucher',
-        'affiliate', 'sponsored', 'advertisement', 'ad', 'promotion',
-        # 中文关键词
-        '购买', '销售', '折扣', '促销', '优惠', '免费', '限时', '点击',
-        '特价', '打折', '便宜', '代购', '微商', '推广'
-    ]
-    
-    # 推广模式
-    promotional_patterns = [
-        r'\b\d+%\s*off\b',  # "50% off"
-        r'\$\d+',           # "$99"
-        r'free\s+shipping', # "free shipping"
-        r'buy\s+now',       # "buy now"
-        r'click\s+here',    # "click here"
-        r'visit\s+our',     # "visit our"
-    ]
-    
-    text = (title + ' ' + content).lower()
-    
-    # 检查关键词
-    keyword_matches = sum(1 for keyword in promotional_keywords if keyword in text)
-    
-    # 检查模式
-    import re
-    pattern_matches = sum(1 for pattern in promotional_patterns if re.search(pattern, text))
-    
-    # 如果有多个匹配或者有模式匹配，认为是推广内容
-    return keyword_matches >= 2 or pattern_matches >= 1
 
 @app.route('/api/reddit/test')
 def reddit_test():
@@ -1416,14 +1781,237 @@ def reddit_test():
             "timestamp": datetime.now().isoformat()
         }), 500
 
+def collect_reddit_promoted_posts(subreddits=None, limit=50):
+    """专门收集Reddit官方推广帖子（Promoted/Sponsored）"""
+    try:
+        import praw
+        
+        # 获取环境变量
+        client_id = os.environ.get('REDDIT_CLIENT_ID')
+        client_secret = os.environ.get('REDDIT_CLIENT_SECRET')
+        username = os.environ.get('REDDIT_USERNAME')
+        password = os.environ.get('REDDIT_PASSWORD')
+        
+        if not client_id or not client_secret:
+            raise Exception("Reddit API credentials not configured")
+        
+        # 初始化Reddit客户端
+        reddit = None
+        auth_mode = "unknown"
+        
+        try:
+            if username and password:
+                reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    username=username,
+                    password=password,
+                    user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+                )
+                user = reddit.user.me()
+                auth_mode = f"script (authenticated as {user.name})"
+            else:
+                reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+                )
+                auth_mode = "read-only"
+        except Exception as auth_error:
+            logger.warning(f"Authentication failed: {auth_error}")
+            reddit = praw.Reddit(
+                client_id=client_id,
+                client_secret=client_secret,
+                user_agent='RedditDataCollector/2.0 by /u/Aware-Blueberry-3586'
+            )
+            auth_mode = "read-only"
+        
+        # 如果没有指定subreddit，使用容易出现推广内容的subreddit
+        if not subreddits:
+            subreddits = [
+                'all',  # 全站搜索最容易找到推广内容
+                'popular',  # 热门内容
+                'deals',
+                'entrepreneur', 
+                'startups', 
+                'business', 
+                'marketing',
+                'technology',
+                'gaming',
+                'movies',
+                'music'
+            ]
+        
+        all_posts = []
+        promoted_posts = []
+        
+        # 搜索策略：使用多种方法寻找推广内容
+        search_strategies = [
+            # 策略1: 搜索包含推广关键词的帖子
+            {
+                'keywords': ['promoted', 'sponsored', 'advertisement'],
+                'sort': 'new',
+                'time_filter': 'week'
+            },
+            # 策略2: 搜索热门内容（推广帖子通常会被推到热门）
+            {
+                'method': 'hot',
+                'limit_per_sub': max(10, limit // len(subreddits))
+            },
+            # 策略3: 搜索新帖子（新的推广内容）
+            {
+                'method': 'new',
+                'limit_per_sub': max(5, limit // (len(subreddits) * 2))
+            }
+        ]
+        
+        for subreddit_name in subreddits:
+            try:
+                subreddit = reddit.subreddit(subreddit_name)
+                
+                # 策略1: 关键词搜索
+                try:
+                    search_results = subreddit.search(
+                        'promoted OR sponsored OR advertisement', 
+                        limit=20,
+                        sort='new',
+                        time_filter='month'
+                    )
+                    
+                    for submission in search_results:
+                        if len(all_posts) >= limit * 3:  # 获取更多帖子以便筛选
+                            break
+                        all_posts.append(submission)
+                        
+                except Exception as search_error:
+                    logger.warning(f"Search failed in r/{subreddit_name}: {search_error}")
+                
+                # 策略2: 热门帖子检查
+                try:
+                    hot_posts = subreddit.hot(limit=20)
+                    for submission in hot_posts:
+                        if len(all_posts) >= limit * 3:
+                            break
+                        all_posts.append(submission)
+                except Exception as hot_error:
+                    logger.warning(f"Hot posts failed in r/{subreddit_name}: {hot_error}")
+                
+                # 策略3: 新帖子检查
+                try:
+                    new_posts = subreddit.new(limit=10)
+                    for submission in new_posts:
+                        if len(all_posts) >= limit * 3:
+                            break
+                        all_posts.append(submission)
+                except Exception as new_error:
+                    logger.warning(f"New posts failed in r/{subreddit_name}: {new_error}")
+                    
+            except Exception as subreddit_error:
+                logger.warning(f"Failed to access r/{subreddit_name}: {subreddit_error}")
+                continue
+        
+        # 处理收集到的帖子，检测推广内容
+        processed_count = 0
+        for submission in all_posts:
+            if processed_count >= limit:
+                break
+                
+            try:
+                # 详细的推广检测
+                is_promoted = detect_promotional_content(
+                    submission.title, 
+                    submission.selftext, 
+                    submission
+                )
+                
+                # 额外的Reddit官方推广检测
+                reddit_promoted = False
+                promoted_indicators = []
+                
+                # 检查所有可能的推广属性
+                try:
+                    # 检查promoted属性
+                    if hasattr(submission, 'promoted') and submission.promoted:
+                        reddit_promoted = True
+                        promoted_indicators.append("promoted_flag")
+                    
+                    # 检查distinguished
+                    if hasattr(submission, 'distinguished') and submission.distinguished:
+                        promoted_indicators.append(f"distinguished_{submission.distinguished}")
+                        if submission.distinguished == 'admin':
+                            reddit_promoted = True
+                    
+                    # 检查stickied
+                    if hasattr(submission, 'stickied') and submission.stickied:
+                        promoted_indicators.append("stickied")
+                    
+                    # 检查标题中的明确标记
+                    title_lower = submission.title.lower()
+                    if 'promoted' in title_lower:
+                        reddit_promoted = True
+                        promoted_indicators.append("title_promoted")
+                    if 'sponsored' in title_lower:
+                        reddit_promoted = True
+                        promoted_indicators.append("title_sponsored")
+                    
+                    # 检查作者名称
+                    if submission.author:
+                        author_name = str(submission.author).lower()
+                        if any(marker in author_name for marker in ['promoted', 'sponsored', 'ad_']):
+                            reddit_promoted = True
+                            promoted_indicators.append("promotional_author")
+                    
+                    # 检查flair
+                    if hasattr(submission, 'link_flair_text') and submission.link_flair_text:
+                        flair_lower = submission.link_flair_text.lower()
+                        if any(marker in flair_lower for marker in ['promoted', 'sponsored', 'ad']):
+                            reddit_promoted = True
+                            promoted_indicators.append("promotional_flair")
+                
+                except Exception as check_error:
+                    logger.warning(f"Error checking promotion attributes for {submission.id}: {check_error}")
+                
+                # 如果检测到推广内容，添加到结果中
+                if is_promoted or reddit_promoted:
+                    post_data = {
+                        "reddit_id": submission.id,
+                        "title": submission.title,
+                        "author": str(submission.author) if submission.author else "[deleted]",
+                        "subreddit": submission.subreddit.display_name,
+                        "score": submission.score,
+                        "num_comments": submission.num_comments,
+                        "created_utc": submission.created_utc,
+                        "url": submission.url,
+                        "selftext": submission.selftext[:500] if submission.selftext else "",
+                        "is_promotional": is_promoted,
+                        "reddit_promoted": reddit_promoted,
+                        "promoted_indicators": promoted_indicators,
+                        "auth_mode": auth_mode,
+                        "collection_method": "promoted_search"
+                    }
+                    promoted_posts.append(post_data)
+                    processed_count += 1
+                    
+            except Exception as post_error:
+                logger.warning(f"Error processing post {submission.id}: {post_error}")
+                continue
+        
+        logger.info(f"Collected {len(promoted_posts)} promoted posts from {len(all_posts)} total posts")
+        return promoted_posts
+        
+    except Exception as e:
+        logger.error(f"Error collecting promoted posts: {e}")
+        raise
+
 @app.route('/api/collect-promotional', methods=['POST'])
 def collect_promotional():
-    """收集推广内容端点"""
+    """收集推广内容端点 - 增强版，专门寻找Reddit官方推广"""
     try:
         data = request.get_json() or {}
         
-        subreddits = data.get('subreddits', ['entrepreneur', 'startups', 'business', 'marketing'])
+        subreddits = data.get('subreddits', None)
         limit = min(data.get('limit', 50), 100)
+        search_type = data.get('search_type', 'all')  # 'all', 'reddit_promoted', 'general'
         
         # 检查Reddit API配置
         client_id = os.environ.get('REDDIT_CLIENT_ID')
@@ -1436,40 +2024,57 @@ def collect_promotional():
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        # 使用推广相关关键词搜索
-        promotional_keywords = ['sale', 'discount', 'promo', 'deal', 'buy', 'offer', 'free', 'coupon']
-        
         search_start = datetime.now()
-        all_posts = []
         
-        # 在多个subreddit中搜索推广内容
-        for subreddit in subreddits:
-            try:
-                posts = perform_reddit_search(
-                    keywords=promotional_keywords[:3],  # 使用前3个关键词
-                    subreddit=subreddit,
-                    limit=limit // len(subreddits),
-                    time_filter='week',
-                    sort='new'
-                )
-                all_posts.extend(posts)
-            except Exception as e:
-                logger.warning(f"Failed to search in r/{subreddit}: {e}")
-        
-        # 过滤出推广内容
-        promotional_posts = [post for post in all_posts if post['is_promotional']]
+        if search_type == 'reddit_promoted':
+            # 专门搜索Reddit官方推广帖子
+            promoted_posts = collect_reddit_promoted_posts(subreddits, limit)
+            all_posts = promoted_posts
+        else:
+            # 使用原有的推广内容搜索，但增强检测
+            if not subreddits:
+                subreddits = ['all', 'deals', 'entrepreneur', 'startups', 'business', 'marketing']
+            
+            # 使用推广相关关键词搜索
+            promotional_keywords = ['deal', 'discount', 'sale', 'promo', 'offer', 'promoted', 'sponsored']
+            
+            all_posts = []
+            
+            # 在多个subreddit中搜索推广内容
+            for subreddit in subreddits:
+                try:
+                    posts = perform_reddit_search(
+                        keywords=promotional_keywords[:3],
+                        subreddit=subreddit,
+                        limit=limit // len(subreddits),
+                        time_filter='week',
+                        sort='new'
+                    )
+                    all_posts.extend(posts)
+                except Exception as e:
+                    logger.warning(f"Failed to search in r/{subreddit}: {e}")
+            
+            # 过滤出推广内容
+            promoted_posts = [post for post in all_posts if post.get('is_promotional') or post.get('reddit_promoted')]
         
         search_time = (datetime.now() - search_start).total_seconds()
         
+        # 统计不同类型的推广内容
+        reddit_promoted_count = len([p for p in promoted_posts if p.get('reddit_promoted')])
+        general_promotional_count = len([p for p in promoted_posts if p.get('is_promotional') and not p.get('reddit_promoted')])
+        
         return jsonify({
             "status": "success",
-            "message": f"Found {len(promotional_posts)} promotional posts out of {len(all_posts)} total posts",
+            "message": f"Found {len(promoted_posts)} promotional posts out of {len(all_posts)} total posts",
             "data": {
-                "posts": promotional_posts,
+                "posts": promoted_posts,
                 "total_found": len(all_posts),
-                "promotional_count": len(promotional_posts),
+                "promotional_count": len(promoted_posts),
+                "reddit_promoted_count": reddit_promoted_count,
+                "general_promotional_count": general_promotional_count,
                 "search_time": round(search_time, 2),
-                "subreddits_searched": subreddits
+                "subreddits_searched": subreddits,
+                "search_type": search_type
             },
             "timestamp": datetime.now().isoformat()
         })
@@ -1683,6 +2288,60 @@ def internal_error(error):
         "timestamp": datetime.now().isoformat(),
         "note": "Check Vercel function logs for details"
     }), 500
+
+@app.route('/api/collect-reddit-promoted', methods=['POST'])
+def collect_reddit_promoted():
+    """专门收集Reddit官方推广帖子的端点"""
+    try:
+        data = request.get_json() or {}
+        
+        subreddits = data.get('subreddits', None)
+        limit = min(data.get('limit', 50), 100)
+        
+        # 检查Reddit API配置
+        client_id = os.environ.get('REDDIT_CLIENT_ID')
+        client_secret = os.environ.get('REDDIT_CLIENT_SECRET')
+        
+        if not client_id or not client_secret:
+            return jsonify({
+                "status": "error",
+                "message": "Reddit API credentials not configured",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        search_start = datetime.now()
+        
+        # 使用专门的Reddit推广帖子收集函数
+        promoted_posts = collect_reddit_promoted_posts(subreddits, limit)
+        
+        search_time = (datetime.now() - search_start).total_seconds()
+        
+        # 统计不同类型的推广内容
+        reddit_promoted_count = len([p for p in promoted_posts if p.get('reddit_promoted')])
+        general_promotional_count = len([p for p in promoted_posts if p.get('is_promotional') and not p.get('reddit_promoted')])
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Found {len(promoted_posts)} Reddit promoted posts",
+            "data": {
+                "posts": promoted_posts,
+                "total_found": len(promoted_posts),
+                "reddit_promoted_count": reddit_promoted_count,
+                "general_promotional_count": general_promotional_count,
+                "search_time": round(search_time, 2),
+                "subreddits_searched": subreddits or ['all', 'popular', 'deals', 'entrepreneur', 'startups'],
+                "search_type": "reddit_promoted_only"
+            },
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in collect Reddit promoted endpoint: {e}")
+        return jsonify({
+            "status": "error",
+            "message": f"Collection failed: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=False) 
