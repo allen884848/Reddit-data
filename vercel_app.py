@@ -311,9 +311,6 @@ COMPLETE_HTML_TEMPLATE = """
                         <a class="nav-link" href="#results-section">Results</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#history-section">History</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="#status-section">Status</a>
                     </li>
                 </ul>
@@ -438,9 +435,8 @@ COMPLETE_HTML_TEMPLATE = """
                             
                             <!-- Quick Action Buttons -->
                             <div class="quick-actions mt-4">
-                                <!-- 第一行：主要搜索功能 -->
-                                <div class="row g-2 justify-content-center mb-2">
-                                    <div class="col-4 col-sm-auto">
+                                <div class="row g-2 justify-content-center">
+                                    <div class="col-6 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
                                                 id="quick-search-btn"
@@ -451,7 +447,7 @@ COMPLETE_HTML_TEMPLATE = """
                                             <span class="d-none d-sm-inline">Quick </span>Search
                                         </button>
                                     </div>
-                                    <div class="col-4 col-sm-auto">
+                                    <div class="col-6 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
                                                 id="collect-promotional-btn"
@@ -462,7 +458,7 @@ COMPLETE_HTML_TEMPLATE = """
                                             <span class="d-none d-sm-inline">General </span>Promo
                                         </button>
                                     </div>
-                                    <div class="col-4 col-sm-auto">
+                                    <div class="col-6 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
                                                 id="collect-reddit-promoted-btn"
@@ -471,21 +467,6 @@ COMPLETE_HTML_TEMPLATE = """
                                                 title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
                                             <i class="bi bi-badge-ad me-1"></i>
                                             <span class="d-none d-sm-inline">Reddit </span>Ads
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- 第二行：辅助功能 -->
-                                <div class="row g-2 justify-content-center">
-                                    <div class="col-6 col-sm-auto">
-                                        <button type="button" 
-                                                class="btn btn-light btn-sm w-100" 
-                                                id="view-history-btn"
-                                                data-bs-toggle="tooltip" 
-                                                data-bs-placement="top" 
-                                                title="查看搜索历史记录">
-                                            <i class="bi bi-clock-history me-1"></i>
-                                            <span class="d-none d-sm-inline">View </span>History
                                         </button>
                                     </div>
                                     <div class="col-6 col-sm-auto">
@@ -573,27 +554,6 @@ COMPLETE_HTML_TEMPLATE = """
                         <!-- Results Grid -->
                         <div id="results-grid" class="results-grid">
                             <!-- Results will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- History Section -->
-        <section id="history-section" class="history-section d-none">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="h4 mb-0">Search History</h2>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="clear-history-btn">
-                                <i class="bi bi-trash me-1"></i>
-                                Clear History
-                            </button>
-                        </div>
-                        
-                        <div id="history-grid" class="history-grid">
-                            <!-- History will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -725,13 +685,11 @@ COMPLETE_HTML_TEMPLATE = """
     <!-- Custom JavaScript -->
     <script>
         // Application state
-        let searchHistory = [];
         let currentResults = [];
         
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
-            loadSearchHistory();
             checkRedditAPIStatus();
         });
         
@@ -747,7 +705,6 @@ COMPLETE_HTML_TEMPLATE = """
             document.getElementById('quick-search-btn').addEventListener('click', quickSearch);
             document.getElementById('collect-promotional-btn').addEventListener('click', collectPromotionalPosts);
             document.getElementById('collect-reddit-promoted-btn').addEventListener('click', collectRedditPromotedPosts);
-            document.getElementById('view-history-btn').addEventListener('click', toggleHistorySection);
             document.getElementById('export-data-btn').addEventListener('click', exportCurrentResults);
             document.getElementById('clear-results-btn').addEventListener('click', clearResults);
             document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
