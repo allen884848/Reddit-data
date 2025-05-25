@@ -49,6 +49,20 @@
         }
 
         /* 特殊按钮样式 */
+        #quick-search-btn {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            border-color: #0d6efd;
+            color: white;
+            font-weight: 600;
+        }
+
+        #quick-search-btn:hover {
+            background: linear-gradient(135deg, #0b5ed7, #0a58ca);
+            border-color: #0b5ed7;
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
         #collect-reddit-promoted-btn {
             background: linear-gradient(135deg, #dc3545, #c82333);
             border-color: #dc3545;
@@ -137,8 +151,20 @@
                     
                     <!-- Quick Action Buttons -->
                     <div class="quick-actions mt-4">
-                        <div class="row g-2 justify-content-center">
-                            <div class="col-6 col-sm-auto">
+                        <!-- 第一行：主要搜索功能 -->
+                        <div class="row g-2 justify-content-center mb-2">
+                            <div class="col-4 col-sm-auto">
+                                <button type="button" 
+                                        class="btn btn-light btn-sm w-100" 
+                                        id="quick-search-btn"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" 
+                                        title="使用当前关键词快速搜索">
+                                    <i class="bi bi-search me-1"></i>
+                                    <span class="d-none d-sm-inline">Quick </span>Search
+                                </button>
+                            </div>
+                            <div class="col-4 col-sm-auto">
                                 <button type="button" 
                                         class="btn btn-light btn-sm w-100" 
                                         id="collect-promotional-btn"
@@ -146,10 +172,10 @@
                                         data-bs-placement="top" 
                                         title="收集基于内容分析的推广帖子（关键词、模式匹配）">
                                     <i class="bi bi-bullseye me-1"></i>
-                                    <span class="d-none d-sm-inline">General </span>Promotional
+                                    <span class="d-none d-sm-inline">General </span>Promo
                                 </button>
                             </div>
-                            <div class="col-6 col-sm-auto">
+                            <div class="col-4 col-sm-auto">
                                 <button type="button" 
                                         class="btn btn-light btn-sm w-100" 
                                         id="collect-reddit-promoted-btn"
@@ -157,9 +183,13 @@
                                         data-bs-placement="top" 
                                         title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
                                     <i class="bi bi-badge-ad me-1"></i>
-                                    <span class="d-none d-sm-inline">Reddit </span>Promoted
+                                    <span class="d-none d-sm-inline">Reddit </span>Ads
                                 </button>
                             </div>
+                        </div>
+                        
+                        <!-- 第二行：辅助功能 -->
+                        <div class="row g-2 justify-content-center">
                             <div class="col-6 col-sm-auto">
                                 <button type="button" 
                                         class="btn btn-light btn-sm w-100" 
@@ -188,8 +218,9 @@
                         <div class="text-center mt-3">
                             <small class="text-muted">
                                 <i class="bi bi-info-circle me-1"></i>
-                                <strong>Reddit Promoted</strong> detects official Reddit ads • 
-                                <strong>General Promotional</strong> detects content-based promotions
+                                <strong>Quick Search</strong> uses your keywords • 
+                                <strong>Reddit Ads</strong> finds official promotions • 
+                                <strong>General Promo</strong> detects content-based ads
                             </small>
                         </div>
                     </div>
@@ -197,11 +228,13 @@
                     <div class="mt-4">
                         <h5>测试说明：</h5>
                         <ul>
-                            <li><strong>Reddit Promoted</strong> 按钮：红色渐变，用于收集Reddit官方推广帖子</li>
-                            <li><strong>General Promotional</strong> 按钮：黄色渐变，用于收集一般推广内容</li>
+                            <li><strong>Quick Search</strong> 按钮：蓝色渐变，用于快速搜索用户输入的关键词</li>
+                            <li><strong>General Promo</strong> 按钮：黄色渐变，用于收集一般推广内容</li>
+                            <li><strong>Reddit Ads</strong> 按钮：红色渐变，用于收集Reddit官方推广帖子</li>
                             <li><strong>View History</strong> 按钮：灰色渐变，查看搜索历史</li>
                             <li><strong>Export Data</strong> 按钮：绿色渐变，导出数据</li>
                             <li>所有按钮都有hover效果和tooltip提示</li>
+                            <li>第一行3个主要功能，第二行2个辅助功能</li>
                             <li>在小屏幕上会自动调整布局</li>
                         </ul>
                     </div>
@@ -229,12 +262,16 @@
             });
 
             // Add click handlers for testing
+            document.getElementById('quick-search-btn').addEventListener('click', function() {
+                document.getElementById('test-output').innerHTML = '🔵 <strong>Quick Search</strong> 按钮被点击！<br>功能：使用当前关键词快速搜索Reddit帖子';
+            });
+
             document.getElementById('collect-promotional-btn').addEventListener('click', function() {
-                document.getElementById('test-output').innerHTML = '🟡 <strong>General Promotional</strong> 按钮被点击！<br>功能：收集基于内容分析的推广帖子';
+                document.getElementById('test-output').innerHTML = '🟡 <strong>General Promo</strong> 按钮被点击！<br>功能：收集基于内容分析的推广帖子';
             });
 
             document.getElementById('collect-reddit-promoted-btn').addEventListener('click', function() {
-                document.getElementById('test-output').innerHTML = '🔴 <strong>Reddit Promoted</strong> 按钮被点击！<br>功能：收集Reddit官方推广帖子（Promoted/Sponsored标记）';
+                document.getElementById('test-output').innerHTML = '🔴 <strong>Reddit Ads</strong> 按钮被点击！<br>功能：收集Reddit官方推广帖子（Promoted/Sponsored标记）';
             });
 
             document.getElementById('view-history-btn').addEventListener('click', function() {

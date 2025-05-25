@@ -200,6 +200,20 @@ COMPLETE_HTML_TEMPLATE = """
         }
 
         /* 特殊按钮样式 */
+        #quick-search-btn {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            border-color: #0d6efd;
+            color: white;
+            font-weight: 600;
+        }
+
+        #quick-search-btn:hover {
+            background: linear-gradient(135deg, #0b5ed7, #0a58ca);
+            border-color: #0b5ed7;
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+        }
+
         #collect-reddit-promoted-btn {
             background: linear-gradient(135deg, #dc3545, #c82333);
             border-color: #dc3545;
@@ -424,8 +438,20 @@ COMPLETE_HTML_TEMPLATE = """
                             
                             <!-- Quick Action Buttons -->
                             <div class="quick-actions mt-4">
-                                <div class="row g-2 justify-content-center">
-                                    <div class="col-6 col-sm-auto">
+                                <!-- 第一行：主要搜索功能 -->
+                                <div class="row g-2 justify-content-center mb-2">
+                                    <div class="col-4 col-sm-auto">
+                                        <button type="button" 
+                                                class="btn btn-light btn-sm w-100" 
+                                                id="quick-search-btn"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="使用当前关键词快速搜索">
+                                            <i class="bi bi-search me-1"></i>
+                                            <span class="d-none d-sm-inline">Quick </span>Search
+                                        </button>
+                                    </div>
+                                    <div class="col-4 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
                                                 id="collect-promotional-btn"
@@ -433,10 +459,10 @@ COMPLETE_HTML_TEMPLATE = """
                                                 data-bs-placement="top" 
                                                 title="收集基于内容分析的推广帖子（关键词、模式匹配）">
                                             <i class="bi bi-bullseye me-1"></i>
-                                            <span class="d-none d-sm-inline">General </span>Promotional
+                                            <span class="d-none d-sm-inline">General </span>Promo
                                         </button>
                                     </div>
-                                    <div class="col-6 col-sm-auto">
+                                    <div class="col-4 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
                                                 id="collect-reddit-promoted-btn"
@@ -444,9 +470,13 @@ COMPLETE_HTML_TEMPLATE = """
                                                 data-bs-placement="top" 
                                                 title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
                                             <i class="bi bi-badge-ad me-1"></i>
-                                            <span class="d-none d-sm-inline">Reddit </span>Promoted
+                                            <span class="d-none d-sm-inline">Reddit </span>Ads
                                         </button>
                                     </div>
+                                </div>
+                                
+                                <!-- 第二行：辅助功能 -->
+                                <div class="row g-2 justify-content-center">
                                     <div class="col-6 col-sm-auto">
                                         <button type="button" 
                                                 class="btn btn-light btn-sm w-100" 
@@ -475,8 +505,9 @@ COMPLETE_HTML_TEMPLATE = """
                                 <div class="text-center mt-3">
                                     <small class="text-white-50">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        <strong>Reddit Promoted</strong> detects official Reddit ads • 
-                                        <strong>General Promotional</strong> detects content-based promotions
+                                        <strong>Quick Search</strong> uses your keywords • 
+                                        <strong>Reddit Ads</strong> finds official promotions • 
+                                        <strong>General Promo</strong> detects content-based ads
                                     </small>
                                 </div>
                             </div>
@@ -713,6 +744,7 @@ COMPLETE_HTML_TEMPLATE = """
             
             // Bind event listeners
             document.getElementById('search-form').addEventListener('submit', handleSearch);
+            document.getElementById('quick-search-btn').addEventListener('click', quickSearch);
             document.getElementById('collect-promotional-btn').addEventListener('click', collectPromotionalPosts);
             document.getElementById('collect-reddit-promoted-btn').addEventListener('click', collectRedditPromotedPosts);
             document.getElementById('view-history-btn').addEventListener('click', toggleHistorySection);
@@ -1264,6 +1296,57 @@ COMPLETE_HTML_TEMPLATE = """
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+        }
+        
+        async function quickSearch() {
+            // 获取当前输入的关键词，如果没有则使用默认关键词
+            let keywords = document.getElementById('keywords-input').value.trim();
+            
+            if (!keywords) {
+                // 如果没有输入关键词，使用热门关键词
+                const defaultKeywords = ['technology', 'programming', 'AI', 'startup'];
+                keywords = defaultKeywords.join(', ');
+                document.getElementById('keywords-input').value = keywords;
+                showToast('Using default keywords: ' + keywords, 'info');
+            }
+            
+            // 使用默认设置进行快速搜索
+            const searchParams = {
+                keywords: keywords.split(',').map(k => k.trim()),
+                subreddit: 'all',
+                time_filter: 'week',
+                sort: 'hot',
+                limit: 50,
+                min_score: 10,
+                min_comments: 5,
+                include_nsfw: false
+            };
+            
+            showSearchProgress('Quick searching...');
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchParams)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayResults(data.data);
+                    addToSearchHistory(searchParams, data.data);
+                    showToast(`Quick search found ${data.data.posts.length} posts!`, 'success');
+                } else {
+                    showToast(`Quick search failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Quick search error: ${error.message}`, 'error');
+            } finally {
+                hideSearchProgress();
+            }
         }
     </script>
 </body>
