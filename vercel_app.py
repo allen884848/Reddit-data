@@ -442,7 +442,7 @@ COMPLETE_HTML_TEMPLATE = """
                                                 id="collect-promotional-btn"
                                                 data-bs-toggle="tooltip" 
                                                 data-bs-placement="top" 
-                                                title="收集基于内容分析的推广帖子（关键词、模式匹配）">
+                                                title="Detect promotional content using AI analysis">
                                             <i class="bi bi-bullseye me-1"></i>
                                             <span class="d-none d-sm-inline">General </span>Promo
                                         </button>
@@ -453,7 +453,7 @@ COMPLETE_HTML_TEMPLATE = """
                                                 id="collect-reddit-promoted-btn"
                                                 data-bs-toggle="tooltip" 
                                                 data-bs-placement="top" 
-                                                title="收集Reddit官方推广帖子（Promoted/Sponsored标记）">
+                                                title="Find official Reddit promoted posts">
                                             <i class="bi bi-badge-ad me-1"></i>
                                             <span class="d-none d-sm-inline">Reddit </span>Ads
                                         </button>
@@ -464,7 +464,7 @@ COMPLETE_HTML_TEMPLATE = """
                                                 id="export-data-btn"
                                                 data-bs-toggle="tooltip" 
                                                 data-bs-placement="top" 
-                                                title="导出当前搜索结果">
+                                                title="Export search results to file">
                                             <i class="bi bi-download me-1"></i>
                                             <span class="d-none d-sm-inline">Export </span>Data
                                         </button>
