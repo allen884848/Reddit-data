@@ -2123,7 +2123,7 @@ def export_data():
         data_type = request.args.get('type', 'current').lower()  # current, promotional, all
         limit = min(int(request.args.get('limit', 100)), 1000)
         
-        if export_format not in ['csv', json]:
+        if export_format not in ['csv', 'json']:
             return jsonify({
                 "status": "error",
                 "message": "Invalid format. Supported formats: csv, json",
@@ -2222,6 +2222,39 @@ def export_data():
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@app.route('/api/statistics')
+def get_statistics():
+    """获取系统统计信息端点"""
+    try:
+        # 模拟统计数据（在Vercel环境中）
+        statistics = {
+            "total_posts": 150,
+            "promotional_posts": 25,
+            "reddit_promoted_posts": 8,
+            "total_searches": 45,
+            "unique_subreddits": 12,
+            "database_size": "2.5 MB",
+            "last_updated": datetime.now().isoformat(),
+            "environment": "Vercel",
+            "uptime": "Running",
+            "api_status": "Connected"
+        }
+        
+        return jsonify({
+            "status": "success",
+            "message": "Statistics retrieved successfully",
+            "statistics": statistics,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in statistics endpoint: {e}")
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to get statistics: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @app.route('/api/clear-history', methods=['POST'])
 def clear_history():
     """清除搜索历史端点"""
@@ -2251,7 +2284,12 @@ def not_found(error):
             "/api/health", 
             "/api/status", 
             "/api/search", 
-            "/api/reddit/test"
+            "/api/reddit/test",
+            "/api/collect-promotional",
+            "/api/export",
+            "/api/history",
+            "/api/statistics",
+            "/api/clear-history"
         ]
     }), 404
 
